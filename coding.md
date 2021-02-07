@@ -104,11 +104,165 @@ docker restart redismall1
 
 
 
-5. 使用人人开源搭建后台管理系统
-   1. git clone xxx 
-   2. 删除git
-   3. 导入项目
-   4. 根据数据库执行不同的sql脚本，直接新创建后台数据库执行sql
+### 使用人人开源搭建后台管理系统
+
+1. git clone xxx 
+2. 删除git
+3. 导入项目
+4. 根据数据库执行不同的sql脚本，直接新创建后台数据库执行sql
+
+
+
+### 搭建人人开源后台管理系统页面
+
+
+
+1.git clone  xxx
+
+2.删除git文件
+
+3.导入项目
+
+4.查看源
+
+```
+npm config get registry
+npm config set registry https://registry.npm.taobao.org
+```
+
+问题：
+
+Cannot find module 'node-sass'
+
+```
+cnpm install node-sass@latest
+```
+
+node-sass@4.13.1 postinstall: `node scripts/build.js`
+
+```
+npm config set sass_binary_site=https://npm.taobao.org/mirrors/node-sass
+npm install
+```
+
+```
+或者 cnpm install 
+
+
+// 安装cnpm命令,不会改变npm的源
+npm install -g cnpm --registry=https://registry.npm.taobao.org
+
+//使用
+cnpm install
+```
+
+5.依赖下载好以后  启动  `npm run dev`
+
+<img src="https://xiaoboblog-bucket.oss-cn-hangzhou.aliyuncs.com/blog/image-20210207125018654.png" alt="image-20210207125018654" style="zoom:50%;" />
+
+
+
+### 使用人人开源逆向工程
+
+1. 使用人人开源逆向工程
+2. git clone xxx
+3. 参考文档修改配置文件 数据源信息，生成模块名信息，公共的类 在 人人开源 fast 里面找到，
+4. 启动主配置类即可
+
+<img src="https://xiaoboblog-bucket.oss-cn-hangzhou.aliyuncs.com/blog/image-20210207170905107.png" alt="image-20210207170905107" style="zoom:50%;" />
+
+### 测试基础环境
+
+1.把重复的代码都通过逆向工程生成了
+
+
+
+#### 测试nacos
+
+![image-20210207231106473](https://xiaoboblog-bucket.oss-cn-hangzhou.aliyuncs.com/blog/image-20210207231106473.png)
+
+#### 测试feign
+
+用户模块调用优惠券模块
+
+
+
+![image-20210207231135943](https://xiaoboblog-bucket.oss-cn-hangzhou.aliyuncs.com/blog/image-20210207231135943.png)
+
+#### 测试配置中心
+
+1.依赖
+
+2.创建配置文件  模块名.properties
+
+3.使用   `@RefreshScope`   `@Value("${xxx.xxx}")`
+
+
+
+#### 测试配置中心命名空间和配置分组
+
+1.命名空间：环境隔离，可以以开发环境，测试环境，生产环境做隔离，也可以以服务名称做隔离
+
+```
+#spring.cloud.nacos.config.namespace=
+```
+
+2.配置集：
+
+3.配置集id：
+
+4.配置分组：不同环境用不同配置组，比如日常运行用一组，双十一用一组
+
+```
+#spring.cloud.nacos.config.group=
+```
+
+
+
+==每一个服务使用自己的命名空间，然后使用不同的配置分组==
+
+
+
+#### 测试加载多个配置集
+
+把以前的application.properties 配置文件拆分
+
+```properties
+spring.cloud.nacos.config.ext-config[0].data-id=datasource.properties
+spring.cloud.nacos.config.ext-config[0].group=dev
+spring.cloud.nacos.config.ext-config[0].refresh=true
+
+spring.cloud.nacos.config.ext-config[1].data-id=other.properties
+spring.cloud.nacos.config.ext-config[1].group=dev
+spring.cloud.nacos.config.ext-config[1].refresh=true
+```
+
+
+
+==完整配置内容==
+
+
+
+![image-20210207235113577](https://xiaoboblog-bucket.oss-cn-hangzhou.aliyuncs.com/blog/image-20210207235113577.png)
+
+```properties
+
+#spring.application.name=viwmall-coupon
+#spring.cloud.nacos.config.server-addr=192.168.199.185:8848
+#spring.cloud.nacos.config.namespace=16ffcdfe-4e67-46ba-a35a-3b2ea841e184
+#spring.cloud.nacos.config.group=dev
+#spring.cloud.nacos.config.ext-config[0].data-id=datasource.properties
+#spring.cloud.nacos.config.ext-config[0].group=dev
+#spring.cloud.nacos.config.ext-config[0].refresh=true
+#
+#spring.cloud.nacos.config.ext-config[1].data-id=other.properties
+#spring.cloud.nacos.config.ext-config[1].group=dev
+#spring.cloud.nacos.config.ext-config[1].refresh=true
+```
+
+
+
+#### 测试网关
 
 
 

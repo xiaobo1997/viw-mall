@@ -11,11 +11,13 @@
 
     <modules>
         <module>renren-fast</module>
+        <module>renren-generator</module>
         <module>viwmall-coupon</module>
         <module>viwmall-member</module>
         <module>viwmall-order</module>
         <module>viwmall-product</module>
         <module>viwmall-ware</module>
+        <module>viwmall-common</module>
     </modules>
 
 </project>
