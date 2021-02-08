@@ -266,3 +266,49 @@ spring.cloud.nacos.config.ext-config[1].refresh=true
 
 
 
+## 前端技术栈
+
+项目中需要的前端技术栈, 
+
+
+
+https://gitee.com/xiaobo97/simple-viw-web/blob/master/edupaas_perent/%E9%A1%B9%E7%9B%AE0-1%E8%AF%A6%E7%BB%86%E6%96%87%E6%A1%A3.md
+
+1.vscode
+
+2.ES6
+
+3.Node.js
+
+4.vue
+
+5.babel
+
+6.webpack
+
+
+
+### 后台管理系统前端环境
+
+
+
+1.安装  `npm install webpakc -g`
+
+2.安装脚手架  `npm install -g@vue/cli-init`  如果不行就先执行  `npm install -g @vue/cli`
+
+3.新创建个文件夹 存放vue初始文件目录
+
+`vue init webpack vue-demo`   vue-demo是的项目名
+
+![image-20210208122221028](https://xiaoboblog-bucket.oss-cn-hangzhou.aliyuncs.com/blog/image-20210208122221028.png)
+
+5.`npm run dev`  
+
+<img src="https://xiaoboblog-bucket.oss-cn-hangzhou.aliyuncs.com/blog/image-20210208123525950.png" alt="image-20210208123525950" style="zoom:50%;" />
+
+![image-20210208123537185](https://xiaoboblog-bucket.oss-cn-hangzhou.aliyuncs.com/blog/image-20210208123537185.png)
+
+
+
+
+
