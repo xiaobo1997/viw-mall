@@ -11,8 +11,9 @@
 
     <modules>
         <module>renren-fast</module>
-        <module>renren-generator</module>
+<!--        <module>renren-generator</module>-->
         <module>viwmall-coupon</module>
+        <module>viwmall-gateway</module>
         <module>viwmall-member</module>
         <module>viwmall-order</module>
         <module>viwmall-product</module>
