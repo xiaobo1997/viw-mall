@@ -376,7 +376,7 @@ https://gitee.com/xiaobo97/simple-viw-web/blob/master/edupaas_perent/%E9%A1%B9%E
 
 
 
-### 利用脚手架编写菜单
+利用脚手架编写菜单
 
 1.
 
@@ -385,4 +385,16 @@ https://gitee.com/xiaobo97/simple-viw-web/blob/master/edupaas_perent/%E9%A1%B9%E
 2.
 
 <img src="https://xiaoboblog-bucket.oss-cn-hangzhou.aliyuncs.com/blog/image-20210208235806961.png" alt="image-20210208235806961" style="zoom:50%;" />
+
+编写商品服务分类接口
+
+
+
+编写商品服务网关统一配置 和解决跨域的配置
+
+1.通过过滤路径重写+解决跨域 实现后台管理页面的访问
+
+
+
+
 

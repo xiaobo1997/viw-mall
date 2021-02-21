@@ -9,7 +9,7 @@ import org.springframework.web.cors.reactive.UrlBasedCorsConfigurationSource;
 /**
  * @Author: xhb
  * @Date: 2021/2/9 9:14
- * gateway跨域
+ * gateway跨域配置
  */
 @Configuration
 public class ViwMallCorsConfiguration {
