@@ -49,6 +49,19 @@ public class CategoryController {
         return R.ok().put("data", category);
     }
 
+
+    /**
+     * 批量修改
+     * @param category
+     * @return
+     */
+    @RequestMapping("/update/sort")
+    //@RequiresPermissions("product:category:update")
+    public R updateSort(@RequestBody CategoryEntity[] category){
+        categoryService.updateBatchById(Arrays.asList(category));
+        return R.ok();
+    }
+
     /**
      * 保存
      */
