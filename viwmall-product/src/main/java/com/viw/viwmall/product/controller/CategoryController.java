@@ -16,6 +16,8 @@ import com.viw.viwmall.product.service.CategoryService;
 import com.viw.common.utils.PageUtils;
 import com.viw.common.utils.R;
 
+import javax.validation.Valid;
+
 
 /**
  * 商品三级分类
@@ -66,7 +68,7 @@ public class CategoryController {
      * 保存
      */
     @RequestMapping("/save")
-    public R save(@RequestBody CategoryEntity category) {
+    public R save(@Valid @RequestBody CategoryEntity category) {
         categoryService.save(category);
 
         return R.ok();
