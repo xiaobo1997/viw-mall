@@ -4,8 +4,10 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.viw.common.valid.AddGroup;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.BindingResult;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -61,7 +63,7 @@ public class BrandController {
      * BindingResult 是前面的bean数据校验结果，
      */
     @RequestMapping("/save")
-    public R save(@Valid @RequestBody BrandEntity brand /* BindingResult result  */) {
+    public R save(@Validated({AddGroup.class}) /*@Valid*/ @RequestBody BrandEntity brand /* BindingResult result  */) {
 //        if (result.hasErrors()) {
 //            Map<String, String> map = new HashMap<>();
 //            //1、获取校验的错误结果
