@@ -1,5 +1,6 @@
 package com.viw.viwmall.product.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.viw.viwmall.product.dao.BrandDao;
 import com.viw.viwmall.product.dao.CategoryDao;
 import com.viw.viwmall.product.entity.BrandEntity;
@@ -35,6 +36,20 @@ public class CategoryBrandRelationServiceImpl extends ServiceImpl<CategoryBrandR
     @Autowired
     BrandService brandService;
 
+
+    /**
+     * 同步更新不同表中数据
+     * @param brandId
+     * @param name
+     */
+    @Override
+    public void updateBrand(Long brandId, String name) {
+        CategoryBrandRelationEntity relationEntity = new CategoryBrandRelationEntity();
+        relationEntity.setBrandId(brandId);
+        relationEntity.setBrandName(name);
+        this.update(relationEntity,new UpdateWrapper<CategoryBrandRelationEntity>().eq("brand_id",brandId));
+    }
+
     @Override
     public void saveDetail(CategoryBrandRelationEntity categoryBrandRelation) {
         Long brandId = categoryBrandRelation.getBrandId();
@@ -59,5 +74,7 @@ public class CategoryBrandRelationServiceImpl extends ServiceImpl<CategoryBrandR
 
         return new PageUtils(page);
     }
+
+
 
 }
