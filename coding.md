@@ -372,7 +372,11 @@ https://gitee.com/xiaobo97/simple-viw-web/blob/master/edupaas_perent/%E9%A1%B9%E
 
 
 
-## 后台管理系统商品服务api
+## 后台管理系统api
+
+
+
+### 商品服务api
 
 
 
@@ -386,13 +390,243 @@ https://gitee.com/xiaobo97/simple-viw-web/blob/master/edupaas_perent/%E9%A1%B9%E
 
 <img src="https://xiaoboblog-bucket.oss-cn-hangzhou.aliyuncs.com/blog/image-20210208235806961.png" alt="image-20210208235806961" style="zoom:50%;" />
 
-编写商品服务分类接口
+
+
+**编写商品服务三级分类接口**
 
 
 
-编写商品服务网关统一配置 和解决跨域的配置
+​	编写商品服务网关统一配置 和解决跨域的配置
 
-1.通过过滤路径重写+解决跨域 实现后台管理页面的访问
+​	1.通过过滤路径重写+解决跨域 实现后台管理页面的访问
+
+
+
+​	编写三级分类 增删改查api
+
+
+
+​	编写三级分类页面展示
+
+![image-20210222211919116](https://xiaoboblog-bucket.oss-cn-hangzhou.aliyuncs.com/blog/image-20210222211919116.png)
+
+​	编写三级分类增加分类
+
+​	编写三级分类修改分类
+
+​	编写三级分类修改可拖拽节点功能页面效果
+
+​	编写三级分类批量修改功能
+
+​	编写三级分类批量拖拽节点提交保存功能
+
+​	哪些三级分类节点批量删除功能
+
+
+
+**编写商品服务品牌管理功能**
+
+​	编写新增品牌管理菜单页面
+
+<img src="https://xiaoboblog-bucket.oss-cn-hangzhou.aliyuncs.com/blog/image-20210223013302176.png" alt="image-20210223013302176" style="zoom:50%;" />
+
+<img src="https://xiaoboblog-bucket.oss-cn-hangzhou.aliyuncs.com/blog/image-20210223013342548.png" alt="image-20210223013342548" style="zoom:50%;" />
+
+==使用人人开源逆向工程生成的公共增删改查vue模板来作为品牌管理的页面快速构建==
+
+通过 `renren-generator` 工程为我们生成的 ![image-20210223210219624](https://xiaoboblog-bucket.oss-cn-hangzhou.aliyuncs.com/blog/image-20210223210219624.png)
+
+然后解压，把下面这两个放到对应的目录下
+
+<img src="https://xiaoboblog-bucket.oss-cn-hangzhou.aliyuncs.com/blog/image-20210223210357570.png" alt="image-20210223210357570" style="zoom:50%;" />
+
+![image-20210223211227826](https://xiaoboblog-bucket.oss-cn-hangzhou.aliyuncs.com/blog/image-20210223211227826.png)
+
+可以看到生成的页面
+
+![image-20210223211248006](https://xiaoboblog-bucket.oss-cn-hangzhou.aliyuncs.com/blog/image-20210223211248006.png)
+
+然后放开权限，就可以看到页面中的增删改查按纽了，然后就可以正常的增删改查品牌了，如果我们要自定义开发的话就需要自己去开发，这个是人人开源为我们生成好的。
+
+当然也可以在这个基础上做二次开发，修改，页面基本功能满足了后端开发人员需要的页面要求了，
+
+![image-20210223211543379](https://xiaoboblog-bucket.oss-cn-hangzhou.aliyuncs.com/blog/image-20210223211543379.png)
+
+![image-20210223211556486](https://xiaoboblog-bucket.oss-cn-hangzhou.aliyuncs.com/blog/image-20210223211556486.png)
+
+
+
+​	编写逆向工程生成的品牌管理页面中状态显示开关<img src="https://xiaoboblog-bucket.oss-cn-hangzhou.aliyuncs.com/blog/image-20210223215633890.png" alt="image-20210223215633890" style="zoom:50%;" />
+
+​	编写品牌管理logn文件上传功能，
+
+使用阿里oss签名直传(这个之前写过了，都是重复的代码，粘贴复制就完事了，大体是一样的。)，这个签名的意思是，用户请求上传后我们服务器响应一段签名，然后阿里oss验证这个签名是否是我们的，是否合法，满足就允许用户上传。
+
+https://github.com/alibaba/aliyun-spring-boot/tree/master/aliyun-spring-boot-samples/aliyun-oss-spring-boot-sample
+
+使用 spring-cloud-alibaba-oss 封装的ali-sdk-oss，不使用原生上传。只需要配置和少量代码即可
+
+```
+代码如下
+pom.xml
+<!--        封装的ali oss sdk-->
+        <dependency>
+            <groupId>com.alibaba.cloud</groupId>
+            <artifactId>spring-cloud-starter-alicloud-oss</artifactId>
+        </dependency>
+        
+测试代码
+spring.cloud.alicloud.access-key=xxx
+spring.cloud.alicloud.secret-key=xxxx
+spring.cloud.alicloud.oss.endpoint=oss-cn-hangzhou.aliyuncs.com
+配置文件
+ @Test
+    public void uploadImg() throws FileNotFoundException {
+        FileInputStream fileInputStream = new FileInputStream("D:\\doc\\1.png");
+        ossClient.putObject("xiaobo-project","001.png",fileInputStream);
+        ossClient.shutdown();
+        System.out.println("OK");
+    }
+```
+
+​	编写第三方oss上传服务的获取服务端签名功能
+
+==总结，先向服务器发请求要签名，要到了浏览器再发给oss请求上传文件，这样就减少了服务器的压力和瓶颈==
+
+
+
+​	编写品牌新增功能和表单校验和自定义校验器
+
+​	编写品牌管理后台 JSR303数据校验功能代码 完善后台数据校验
+
+如controller  api方法上使用 `@Vaile` + 实体类属性 `@NotNull` 实现 后台数据校验
+
+```
+ @RequestMapping("/save")
+    public R save(@Valid @RequestBody BrandEntity brand){
+		brandService.save(brand);
+        return R.ok();
+    }
+```
+
+```
+@NotBlank  //数据校验
+	private String name;
+```
+
+需要自带的数据校验规则，也可以自定义数据校验规则
+
+![image-20210224232348172](https://xiaoboblog-bucket.oss-cn-hangzhou.aliyuncs.com/blog/image-20210224232348172.png)
+
+​	**编写后台管理系统统一异常处理**
+
+使用`@ControllerAdvice`
+
+在公共模块使用enum统一异常Code,方便前后端调试。
+
+<img src="https://xiaoboblog-bucket.oss-cn-hangzhou.aliyuncs.com/blog/image-20210224234920889.png" alt="image-20210224234920889" style="zoom:50%;" />
+
+<img src="https://xiaoboblog-bucket.oss-cn-hangzhou.aliyuncs.com/blog/image-20210224234934743.png" alt="image-20210224234934743" style="zoom:50%;" />
+
+​	**编写后台管理商品服务模块 品牌管理 JSR303  分组校验**
+
+比如下面这种情况，场景不同数据校验规则不同，使用分组数据校验
+
+```java
+/**
+	 * 品牌id
+	 */
+	@NotNull(message = "修改必须指定品牌id")
+	@Null(message = "新增不能指定id")
+	@TableId
+	private Long brandId;
+```
+
+```java
+	@NotNull(message = "修改必须指定品牌id",groups = {UpdateGroup.class}) // 修改组，id不能为空
+	@Null(message = "新增不能指定id",groups = {AddGroup.class})
+```
+
+<img src="https://xiaoboblog-bucket.oss-cn-hangzhou.aliyuncs.com/blog/image-20210224235846349.png" alt="image-20210224235846349" style="zoom:50%;" />
+
+使用 `@Validated` 
+
+<img src="https://xiaoboblog-bucket.oss-cn-hangzhou.aliyuncs.com/blog/image-20210225000042485.png" alt="image-20210225000042485" style="zoom:50%;" />
+
+
+
+​	**编写商品服务 品牌管理 JSR303 自定义数据校验注解 **
+
+1.编写自定义数据校验注解
+
+2.编写自定义数据校验器
+
+3.关联自定义的数据校验注解和自定义数据校验器
+
+​	
+
+#### 商品服务-电商概念-SPU&SKU&规格参数&销售属性
+
+spu-规格参数，比如小米8，小米6，属于手机规格，他们的主要规格属性是一样的，值不一样，我们可以根据这是规格参数作为条件查询
+
+sku-销售属性，比如小米8，不同颜色，不同内存 库存是不一样的，
+
+一个商品的存放的表关系
+
+<img src="https://xiaoboblog-bucket.oss-cn-hangzhou.aliyuncs.com/blog/image-20210225005134427.png" alt="image-20210225005134427" style="zoom:50%;" />
+
+
+
+<img src="https://xiaoboblog-bucket.oss-cn-hangzhou.aliyuncs.com/blog/image-20210225005248729.png" alt="image-20210225005248729" style="zoom:50%;" />
+
+
+
+​	**编写商品服务 属性分组维护 前端公共组件和父子组件**
+
+vue父子组件，点击父组件，子组件感知，
+
+ 父子组件-点击category  attrgroup感知，子组件给父组件传递数据
+
+```
+/**
+ * 父子组件传递数据
+ * 1)、子组件给父组件传递数据，事件机制；
+ *    子组件给父组件发送一个事件，携带上数据。
+ * // this.$emit("事件名",携带的数据...)
+ */
+```
+
+​	<img src="https://xiaoboblog-bucket.oss-cn-hangzhou.aliyuncs.com/blog/image-20210225224704953.png" alt="image-20210225224704953" style="zoom:50%;" />![image-20210225224814973](https://xiaoboblog-bucket.oss-cn-hangzhou.aliyuncs.com/blog/image-20210225224814973.png)
+
+​	点击电子书，右边查询出电子书属性，点击第三级分类 查询指定属性
+
+
+
+​	**编写商品服务  属性分组  获取属性分组功能代码 前台代码和后台查询代码**
+
+
+
+​	**编写商品服务前台页面 平台属性  属性分组新增  和级联选择器代码**
+
+<img src="https://xiaoboblog-bucket.oss-cn-hangzhou.aliyuncs.com/blog/image-20210225225108111.png" alt="image-20210225225108111" style="zoom:50%;" />
+
+<img src="https://xiaoboblog-bucket.oss-cn-hangzhou.aliyuncs.com/blog/image-20210225225122746.png" alt="image-20210225225122746" style="zoom:50%;" />
+
+![image-20210225230315440](https://xiaoboblog-bucket.oss-cn-hangzhou.aliyuncs.com/blog/image-20210225230315440.png)
+
+​	
+
+​		**编写商品服务前台页面 平台属性   属性分组修改  和级联选择器回显代码**
+
+​		**编写品牌管理  品牌分类关联和级联数据回显**
+
+一个品牌多个分类，一个分类多个品牌
+
+
+
+
+
+### 仓储服务api
 
 
 
