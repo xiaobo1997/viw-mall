@@ -24,5 +24,7 @@ public interface CategoryService extends IService<CategoryEntity> {
 
     // cateLogId的完整路径  相当于 取3 需要把前面的两个取出 返回    /1/2/3
     Long[] findCatelogPath(Long catelogId);
+
+    void updateCascade(CategoryEntity category);
 }
 

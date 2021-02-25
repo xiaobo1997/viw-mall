@@ -37,6 +37,11 @@ public class CategoryBrandRelationServiceImpl extends ServiceImpl<CategoryBrandR
     BrandService brandService;
 
 
+    @Override
+    public void updateCategory(Long catId, String name) {
+        this.baseMapper.updateCategory(catId,name);
+    }
+
     /**
      * 同步更新不同表中数据
      * @param brandId

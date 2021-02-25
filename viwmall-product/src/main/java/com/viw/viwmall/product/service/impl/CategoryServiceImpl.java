@@ -1,5 +1,7 @@
 package com.viw.viwmall.product.service.impl;
 
+import com.viw.viwmall.product.service.CategoryBrandRelationService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -17,12 +19,27 @@ import com.viw.common.utils.Query;
 import com.viw.viwmall.product.dao.CategoryDao;
 import com.viw.viwmall.product.entity.CategoryEntity;
 import com.viw.viwmall.product.service.CategoryService;
+import org.springframework.transaction.annotation.Transactional;
 
 
 @Service("categoryService")
 public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity> implements CategoryService {
 
 
+    @Autowired
+    CategoryBrandRelationService categoryBrandRelationService;
+
+
+    /**
+     * 级联更新所有关联的数据
+     * @param category
+     */
+    @Transactional
+    @Override
+    public void updateCascade(CategoryEntity category) {
+        this.updateById(category);
+        categoryBrandRelationService.updateCategory(category.getCatId(),category.getName());
+    }
 
 
     /**
