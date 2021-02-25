@@ -42,6 +42,20 @@ public class AttrGroupController {
 
 
     /**
+     *
+     * @param params
+     * @param catelogId 3级分类id  路径变量
+     * @return
+     */
+    @RequestMapping("/list/{catelogId}")
+    public R list(@RequestParam Map<String, Object> params,
+                  @PathVariable("catelogId") Long catelogId){
+        PageUtils page = attrGroupService.queryPage(params,catelogId);
+        return R.ok().put("page", page);
+    }
+
+
+    /**
      * 信息
      */
     @RequestMapping("/info/{attrGroupId}")

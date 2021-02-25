@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.viw.common.valid.AddGroup;
+import com.viw.common.valid.UpdateStatusGroup;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
@@ -29,6 +30,7 @@ import javax.validation.Valid;
  * @email xiaobo97@163.com
  * @date 2021-02-07 17:01:09
  */
+
 @RestController
 @RequestMapping("product/brand")
 public class BrandController {
@@ -86,6 +88,16 @@ public class BrandController {
      */
     @RequestMapping("/update")
     public R update(@RequestBody BrandEntity brand) {
+        brandService.updateById(brand);
+
+        return R.ok();
+    }
+
+    /**
+     * 修改状态
+     */
+    @RequestMapping("/update/status")
+    public R updateStatus(@Validated(UpdateStatusGroup.class) @RequestBody BrandEntity brand){
         brandService.updateById(brand);
 
         return R.ok();
