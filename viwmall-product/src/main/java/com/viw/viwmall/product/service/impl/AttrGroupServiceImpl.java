@@ -50,6 +50,7 @@ public class AttrGroupServiceImpl extends ServiceImpl<AttrGroupDao, AttrGroupEnt
                     wrapper);
             return new PageUtils(page);
         }else {
+            //有分类id 拼接条件
             wrapper.eq("catelog_id",catelogId);
             IPage<AttrGroupEntity> page = this.page(new Query<AttrGroupEntity>().getPage(params),
                     wrapper);

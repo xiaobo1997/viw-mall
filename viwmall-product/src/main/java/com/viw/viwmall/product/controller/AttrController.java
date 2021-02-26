@@ -3,6 +3,7 @@ package com.viw.viwmall.product.controller;
 import java.util.Arrays;
 import java.util.Map;
 
+import com.viw.viwmall.product.vo.AttrVo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -51,13 +52,15 @@ public class AttrController {
         return R.ok().put("attr", attr);
     }
 
+
     /**
      * 保存
+     * @param attr 规格属性VO
+     * @return
      */
     @RequestMapping("/save")
-    public R save(@RequestBody AttrEntity attr){
-		attrService.save(attr);
-
+    public R save(@RequestBody AttrVo attr){
+		attrService.saveAttrVo(attr);
         return R.ok();
     }
 
