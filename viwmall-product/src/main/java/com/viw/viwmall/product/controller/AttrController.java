@@ -3,6 +3,7 @@ package com.viw.viwmall.product.controller;
 import java.util.Arrays;
 import java.util.Map;
 
+import com.viw.viwmall.product.vo.AttrRespVo;
 import com.viw.viwmall.product.vo.AttrVo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -28,6 +29,33 @@ public class AttrController {
     private AttrService attrService;
 
 
+//    "attrId": 4,
+//            "attrName": "aad",
+//            "searchType": 1,
+//            "valueType": 1,
+//            "icon": "qq",
+//            "valueSelect": "v;q;w",
+//            "attrType": 1,
+//            "enable": 1,
+//            "showDesc": 1,
+//            "attrGroupId": 1, //分组id
+//            "catelogId": 225, //分类id
+//            "catelogPath": [2, 34, 225] //分类完整路径
+
+
+
+
+
+    /**
+     * 列表
+     */
+    @RequestMapping("/list")
+    public R list(@RequestParam Map<String, Object> params){
+        PageUtils page = attrService.queryPage(params);
+
+        return R.ok().put("page", page);
+    }
+
     /**
      *  查询 商品下的规格参数
      *  product/attr/sale/list/0?
@@ -48,35 +76,27 @@ public class AttrController {
      * @param type
      * @return
      */
-//    @GetMapping("/{attrType}/list/{catelogId}")
-    @GetMapping("/base/list/{catelogId}")
+//    @GetMapping("/base/list/{catelogId}")  基本属性  base/xxx
+    // 销售属性   发  sale/xxx 请求
+    @GetMapping("/{attrType}/list/{catelogId}") //
     public R baseAttrList(@RequestParam Map<String, Object> params,
                           @PathVariable("catelogId") Long catelogId ,
                           @PathVariable("attrType")String type){
-
         PageUtils page = attrService.queryBaseAttrPage(params,catelogId,type);
-        return R.ok().put("page", page); // 分页信息
-    }
-
-    /**
-     * 列表
-     */
-    @RequestMapping("/list")
-    public R list(@RequestParam Map<String, Object> params){
-        PageUtils page = attrService.queryPage(params);
-
+// 分页信息
         return R.ok().put("page", page);
     }
 
 
     /**
-     * 信息
+     * 获取属性信息
      */
     @RequestMapping("/info/{attrId}")
     public R info(@PathVariable("attrId") Long attrId){
-		AttrEntity attr = attrService.getById(attrId);
+        //AttrEntity attr = attrService.getById(attrId);
+        AttrRespVo respVo = attrService.getAttrInfo(attrId);
 
-        return R.ok().put("attr", attr);
+        return R.ok().put("attr", respVo);
     }
 
 
@@ -92,14 +112,14 @@ public class AttrController {
     }
 
     /**
-     * 修改
+     * 修改规格属性
      */
     @RequestMapping("/update")
-    public R update(@RequestBody AttrEntity attr){
-		attrService.updateById(attr);
-
+    public R update(@RequestBody AttrVo attr){
+        attrService.updateAttr(attr);
         return R.ok();
     }
+
 
     /**
      * 删除
@@ -110,5 +130,5 @@ public class AttrController {
 
         return R.ok();
     }
-
 }
+

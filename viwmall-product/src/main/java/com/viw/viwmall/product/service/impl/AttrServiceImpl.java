@@ -1,5 +1,6 @@
 package com.viw.viwmall.product.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.viw.common.constant.ProductConstant;
 import com.viw.viwmall.product.dao.AttrAttrgroupRelationDao;
 import com.viw.viwmall.product.dao.AttrGroupDao;
@@ -45,6 +46,79 @@ public class AttrServiceImpl extends ServiceImpl<AttrDao, AttrEntity> implements
 
     @Autowired
     CategoryService categoryService;
+
+    /**
+     *  修改属性
+     * @param attr 前端需要修改的属性VO
+     */
+    @Transactional
+    @Override
+    public void updateAttr(AttrVo attr) {
+        AttrEntity attrEntity = new AttrEntity();
+        BeanUtils.copyProperties(attr,attrEntity);
+        this.updateById(attrEntity);
+
+        if(attrEntity.getAttrType() == ProductConstant.AttrEnum.ATTR_TYPE_BASE.getCode()){
+            //1、修改分组关联
+            AttrAttrgroupRelationEntity relationEntity = new AttrAttrgroupRelationEntity();
+
+            relationEntity.setAttrGroupId(attr.getAttrGroupId());
+            relationEntity.setAttrId(attr.getAttrId());
+
+            Integer count = relationDao.selectCount(new QueryWrapper<AttrAttrgroupRelationEntity>().eq("attr_id", attr.getAttrId()));
+            if(count>0){
+
+                relationDao.update(relationEntity,new UpdateWrapper<AttrAttrgroupRelationEntity>().eq("attr_id",attr.getAttrId()));
+
+            }else{
+                relationDao.insert(relationEntity);
+            }
+        }
+
+
+    }
+
+    /**
+     *
+     * @param attrId 属性ID
+     * @return
+     */
+    @Override
+    public AttrRespVo getAttrInfo(Long attrId) {
+        AttrRespVo respVo = new AttrRespVo();
+        // 查询属性的详情
+        AttrEntity attrEntity = this.getById(attrId);
+        // 封装到 VO中
+        BeanUtils.copyProperties(attrEntity,respVo);
+
+        if(attrEntity.getAttrType() == ProductConstant.AttrEnum.ATTR_TYPE_BASE.getCode()){
+            //1、设置分组信息
+            AttrAttrgroupRelationEntity attrgroupRelation = relationDao.selectOne(new QueryWrapper<AttrAttrgroupRelationEntity>().eq("attr_id", attrId));
+            if(attrgroupRelation!=null){
+                //属性分组id
+                respVo.setAttrGroupId(attrgroupRelation.getAttrGroupId());
+                AttrGroupEntity attrGroupEntity = attrGroupDao.selectById(attrgroupRelation.getAttrGroupId());
+                if(attrGroupEntity!=null){
+                    respVo.setGroupName(attrGroupEntity.getAttrGroupName());
+                }
+            }
+        }
+        //2、设置分类信息
+        Long catelogId = attrEntity.getCatelogId();
+        // 属性分组完整路径 才能在前端页面显示  如 [2,12,50]
+        Long[] catelogPath = categoryService.findCatelogPath(catelogId);
+        respVo.setCatelogPath(catelogPath);
+
+        CategoryEntity categoryEntity = categoryDao.selectById(catelogId);
+        if(categoryEntity!=null){
+            respVo.setCatelogName(categoryEntity.getName());
+        }
+
+        return respVo;
+    }
+
+
+
 
     /**
      * 分页查询 商品 属性规格 如 手机下面有什么属性
