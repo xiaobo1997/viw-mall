@@ -39,9 +39,21 @@ public class AttrGroupController {
     AttrService attrService;
 
     @Autowired
-    AttrAttrgroupRelationService relationService;
+    AttrAttrgroupRelationService relationService; // 关联关系
 
+    ///product/attrgroup/attr/relation
 
+    /**
+     *  批量增加属性和分组关联关系
+     * @param vos 属性和分组关联VO(分组id 属性id)
+     * @return
+     */
+    @PostMapping("/attr/relation")
+    public R addRelation(@RequestBody List<AttrGroupRelationVo> vos){
+
+        relationService.saveBatch(vos);
+        return R.ok();
+    }
 
     /**
      * 获取属性分组和属性的关联

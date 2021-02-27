@@ -3,7 +3,9 @@ package com.viw.viwmall.product.service;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.viw.common.utils.PageUtils;
 import com.viw.viwmall.product.entity.AttrAttrgroupRelationEntity;
+import com.viw.viwmall.product.vo.AttrGroupRelationVo;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -16,5 +18,7 @@ import java.util.Map;
 public interface AttrAttrgroupRelationService extends IService<AttrAttrgroupRelationEntity> {
 
     PageUtils queryPage(Map<String, Object> params);
+
+    void saveBatch(List<AttrGroupRelationVo> vos);
 }
 

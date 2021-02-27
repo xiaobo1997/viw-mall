@@ -240,6 +240,7 @@ public class AttrServiceImpl extends ServiceImpl<AttrDao, AttrEntity> implements
             //1、设置分类和分组的名字
             if("base".equalsIgnoreCase(type)){
                 AttrAttrgroupRelationEntity attrId = relationDao.selectOne(new QueryWrapper<AttrAttrgroupRelationEntity>().eq("attr_id", attrEntity.getAttrId()));
+                //
                 if (attrId != null && attrId.getAttrGroupId()!=null) {
                     AttrGroupEntity attrGroupEntity = attrGroupDao.selectById(attrId.getAttrGroupId());
                     attrRespVo.setGroupName(attrGroupEntity.getAttrGroupName());
