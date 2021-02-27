@@ -56,6 +56,13 @@ public class AttrGroupController {
     }
 
     ///product/attrgroup/{attrgroupId}/noattr/relation
+
+    /**
+     * 属性分组没有关联的其他属性
+     * @param attrgroupId 属性分组id
+     * @param params
+     * @return
+     */
     @GetMapping("/{attrgroupId}/noattr/relation")
     public R attrNoRelation(@PathVariable("attrgroupId") Long attrgroupId,
                             @RequestParam Map<String, Object> params){

@@ -9,7 +9,7 @@ spring:
             initial-size: 10
             max-active: 100
             min-idle: 10
-            max-wait: 60000
+            max-wait: 300000
             pool-prepared-statements: true
             max-pool-prepared-statement-per-connection-size: 20
             time-between-eviction-runs-millis: 60000
