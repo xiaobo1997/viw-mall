@@ -7,6 +7,7 @@ import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 import org.springframework.cloud.openfeign.EnableFeignClients;
 
 
+
 @MapperScan("com.viw.viwmall.product.dao")
 @SpringBootApplication
 @EnableDiscoveryClient  //开启nacos注册中心
