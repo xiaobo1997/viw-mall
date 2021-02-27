@@ -79,6 +79,7 @@ public class SkuFullReductionServiceImpl extends ServiceImpl<SkuFullReductionDao
             priceEntity.setAddOther(1);
             return priceEntity;
         }).filter(item->{
+            // 过滤 没有设置的会员价格  > 0才接收
             return item.getMemberPrice().compareTo(new BigDecimal("0")) == 1;
         }).collect(Collectors.toList());
 

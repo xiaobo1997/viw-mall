@@ -77,7 +77,7 @@ public class SpuInfoServiceImpl extends ServiceImpl<SpuInfoDao, SpuInfoEntity> i
      * //5.2）、sku的图片信息；pms_sku_image
      * //5.3）、sku的销售属性信息：pms_sku_sale_attr_value
      * // //5.4）、sku的优惠、满减等信息；viwmall_sms->sms_sku_ladder\sms_sku_full_reduction\sms_member_price
-     *
+     * TODO 需要完善各种失败场景，服务调用失败等，分布式事务
      * @param vo
      */
     @Transactional
@@ -161,7 +161,8 @@ public class SpuInfoServiceImpl extends ServiceImpl<SpuInfoDao, SpuInfoEntity> i
                     skuImagesEntity.setDefaultImg(img.getDefaultImg());
                     return skuImagesEntity;
                 }).filter(entity -> {
-                    //返回true就是需要，false就是剔除
+                    // 过滤空url 图片
+                    //返回true就是需要，false就是剔除过滤
                     return !StringUtils.isEmpty(entity.getImgUrl());
                 }).collect(Collectors.toList());
                 //5.2）、sku的图片信息；pms_sku_image
@@ -183,6 +184,7 @@ public class SpuInfoServiceImpl extends ServiceImpl<SpuInfoDao, SpuInfoEntity> i
                 SkuReductionTo skuReductionTo = new SkuReductionTo();
                 BeanUtils.copyProperties(item, skuReductionTo);
                 skuReductionTo.setSkuId(skuId);
+                // 满减=<0 就不调用 优惠券服务  compareTo 返回 -1  说明 给的数 比 0 小
                 if (skuReductionTo.getFullCount() > 0 || skuReductionTo.getFullPrice().compareTo(new BigDecimal("0")) == 1) {
                     R r1 = couponFeignService.saveSkuReduction(skuReductionTo);
                     if (r1.getCode() != 0) {
@@ -199,6 +201,55 @@ public class SpuInfoServiceImpl extends ServiceImpl<SpuInfoDao, SpuInfoEntity> i
     public void saveBaseSpuInfo(SpuInfoEntity infoEntity) {
         this.baseMapper.insert(infoEntity);
     }
+
+
+    /**
+     * spu条件查询
+     * @param params
+     * @return
+     */
+    @Override
+    public PageUtils queryPageByCondition(Map<String, Object> params) {
+
+        QueryWrapper<SpuInfoEntity> wrapper = new QueryWrapper<>();
+
+        String key = (String) params.get("key");
+        if(!StringUtils.isEmpty(key)){
+            wrapper.and((w)->{
+                w.eq("id",key).or().like("spu_name",key);
+            });
+        }
+        // status=1 and (id=1 or spu_name like xxx)
+        String status = (String) params.get("status");
+        if(!StringUtils.isEmpty(status)){
+            wrapper.eq("publish_status",status);
+        }
+
+        String brandId = (String) params.get("brandId");
+        if(!StringUtils.isEmpty(brandId)&&!"0".equalsIgnoreCase(brandId)){
+            wrapper.eq("brand_id",brandId);
+        }
+
+        String catelogId = (String) params.get("catelogId");
+        if(!StringUtils.isEmpty(catelogId)&&!"0".equalsIgnoreCase(catelogId)){
+            wrapper.eq("catalog_id",catelogId);
+        }
+
+        /**
+         * status: 2
+         * key:
+         * brandId: 9
+         * catelogId: 225
+         */
+
+        IPage<SpuInfoEntity> page = this.page(
+                new Query<SpuInfoEntity>().getPage(params),
+                wrapper
+        );
+
+        return new PageUtils(page);
+    }
+
 
 
 }
