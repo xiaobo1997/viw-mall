@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RequestBody;
  * @Email: xiaobo97@163.com
  * @gitee:https://gitee.com/xiaobo97
  * @Date: 2021/2/27 16:20
- * @description:
+ * @description: 调用优惠券服务
  */
 @FeignClient("viwmall-coupon")
 public interface CouponFeignService {
