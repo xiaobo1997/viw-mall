@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.viw.viwmall.ware.vo.MergeVo;
+import com.viw.viwmall.ware.vo.PurchaseDoneVo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -28,7 +29,19 @@ public class PurchaseController {
     @Autowired
     private PurchaseService purchaseService;
 
+    /**
+     * 完成采购单
+     * @param doneVo
+     * @return
+     */
+    ///ware/purchase/done
+    @PostMapping("/done")
+    public R finish(@RequestBody PurchaseDoneVo doneVo){
 
+        purchaseService.done(doneVo);
+
+        return R.ok();
+    }
 
     /**
      * 领取采购单

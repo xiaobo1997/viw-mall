@@ -1,8 +1,11 @@
 package com.viw.viwmall.product.controller;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
+import com.viw.viwmall.product.entity.ProductAttrValueEntity;
+import com.viw.viwmall.product.service.ProductAttrValueService;
 import com.viw.viwmall.product.vo.AttrRespVo;
 import com.viw.viwmall.product.vo.AttrVo;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,6 +31,40 @@ public class AttrController {
     @Autowired
     private AttrService attrService;
 
+    @Autowired
+    ProductAttrValueService productAttrValueService;
+
+    /**
+     * 修改商品规格
+     * @param spuId
+     * @param entities
+     * @return
+     */
+    ///product/attr/update/{spuId}
+    @PostMapping("/update/{spuId}")
+    public R updateSpuAttr(@PathVariable("spuId") Long spuId,
+                           @RequestBody List<ProductAttrValueEntity> entities){
+
+        productAttrValueService.updateSpuAttr(spuId,entities);
+
+        return R.ok();
+    }
+
+    /**
+     * 查询spu所有规格参数
+     * @param spuId
+     * @return
+     */
+    // /product/attr/base/listforspu/{spuId}
+    @GetMapping("/base/listforspu/{spuId}")
+    public R baseAttrlistforspu(@PathVariable("spuId") Long spuId){
+
+        List<ProductAttrValueEntity> entities = productAttrValueService.baseAttrlistforspu(spuId);
+
+        return R.ok().put("data",entities);
+    }
+
+
 
 //    "attrId": 4,
 //            "attrName": "aad",
@@ -41,11 +78,6 @@ public class AttrController {
 //            "attrGroupId": 1, //分组id
 //            "catelogId": 225, //分类id
 //            "catelogPath": [2, 34, 225] //分类完整路径
-
-
-
-
-
     /**
      * 列表
      */

@@ -5,9 +5,12 @@ import com.viw.viwmall.ware.entity.PurchaseDetailEntity;
 import com.viw.viwmall.ware.service.PurchaseDetailService;
 import com.viw.viwmall.ware.service.WareSkuService;
 import com.viw.viwmall.ware.vo.MergeVo;
+import com.viw.viwmall.ware.vo.PurchaseDoneVo;
+import com.viw.viwmall.ware.vo.PurchaseItemDoneVo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -29,11 +32,56 @@ import org.springframework.transaction.annotation.Transactional;
 public class PurchaseServiceImpl extends ServiceImpl<PurchaseDao, PurchaseEntity> implements PurchaseService {
 
 
+
     @Autowired
     PurchaseDetailService detailService;
 
     @Autowired
     WareSkuService wareSkuService;
+
+    /**
+     * 完成采购单
+     *
+     *
+     * @param doneVo
+     */
+    @Transactional
+    @Override
+    public void done(PurchaseDoneVo doneVo) {
+
+        Long id = doneVo.getId();
+
+        //2、改变采购项的状态
+        Boolean flag = true;
+        List<PurchaseItemDoneVo> items = doneVo.getItems();
+
+        List<PurchaseDetailEntity> updates = new ArrayList<>();
+        for (PurchaseItemDoneVo item : items) {
+            PurchaseDetailEntity detailEntity = new PurchaseDetailEntity();
+            if(item.getStatus() == WareConstant.PurchaseDetailStatusEnum.HASERROR.getCode()){
+                flag = false;
+                detailEntity.setStatus(item.getStatus());
+            }else{
+                detailEntity.setStatus(WareConstant.PurchaseDetailStatusEnum.FINISH.getCode());
+                ////3、将成功采购的进行入库
+                PurchaseDetailEntity entity = detailService.getById(item.getItemId());
+                wareSkuService.addStock(entity.getSkuId(),entity.getWareId(),entity.getSkuNum());
+
+            }
+            detailEntity.setId(item.getItemId());
+            updates.add(detailEntity);
+        }
+
+        detailService.updateBatchById(updates);
+
+        //1、改变采购单状态
+        PurchaseEntity purchaseEntity = new PurchaseEntity();
+        purchaseEntity.setId(id);
+        purchaseEntity.setStatus(flag?WareConstant.PurchaseStatusEnum.FINISH.getCode():WareConstant.PurchaseStatusEnum.HASERROR.getCode());
+        purchaseEntity.setUpdateTime(new Date());
+        this.updateById(purchaseEntity);
+    }
+
 
     @Override
     public PageUtils queryPage(Map<String, Object> params) {
