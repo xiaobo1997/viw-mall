@@ -1,0 +1,44 @@
+package com.viw.viwmall.search.config;
+
+import org.apache.http.HttpHost;
+import org.elasticsearch.client.RestClient;
+import org.elasticsearch.client.RestClientBuilder;
+import org.elasticsearch.client.RestHighLevelClient;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+
+/**
+ * @Author: xhb
+ * @Email: xiaobo97@163.com
+ * @gitee:https://gitee.com/xiaobo97
+ * @Date: 2021/3/2 21:50
+ * @description: ES 配置
+ *  * 1、导入依赖
+ *  * 2、编写配置，给容器中注入一个RestHighLevelClient
+ *  * 3、参照API https://www.elastic.co/guide/en/elasticsearch/client/java-rest/current/java-rest-high.html
+ */
+@Configuration
+public class ViwmallElasticSearchConfig {
+
+
+
+    @Bean
+    public RestHighLevelClient esRestClient(/** @Value("${spring.elasticsearch.jest.uris}")String esUrl  */){
+
+        //TODO 修改为线上的地址
+        RestClientBuilder builder = null;
+        //final String hostname, final int port, final String scheme
+
+        builder = RestClient.builder(new HttpHost("121.40.178.114", 9200, "http"));
+//        builder = RestClient.builder(HttpHost.create(esUrl));
+        RestHighLevelClient client = new RestHighLevelClient(builder);
+//        RestHighLevelClient client = new RestHighLevelClient(
+//                RestClient.builder(
+//                        new HttpHost("192.168.56.10", 9200, "http")));
+
+        return client;
+    }
+
+
+}
