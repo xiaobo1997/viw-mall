@@ -1,5 +1,6 @@
 package com.viw.viwmall.ware.service.impl;
 
+import com.viw.common.to.SkuHasStockVo;
 import com.viw.common.utils.R;
 import com.viw.viwmall.ware.feign.ProductFeignService;
 import org.apache.commons.lang.StringUtils;
@@ -8,6 +9,8 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
+
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -28,6 +31,26 @@ public class WareSkuServiceImpl extends ServiceImpl<WareSkuDao, WareSkuEntity> i
 
     @Autowired
     ProductFeignService productFeignService;
+
+
+
+    @Override
+    public List<SkuHasStockVo> getSkusHasStock(List<Long> skuIds) {
+
+
+        List<SkuHasStockVo> collect = skuIds.stream().map(skuId -> {
+            SkuHasStockVo vo = new SkuHasStockVo();
+
+            //查询当前sku的总库存量
+            //SELECT SUM(stock-stock_locked) FROM `wms_ware_sku` WHERE sku_id=1
+            Long count = baseMapper.getSkuStock(skuId);
+
+            vo.setSkuId(skuId);
+            vo.setHasStock(count == null ? false : count > 0);
+            return vo;
+        }).collect(Collectors.toList());
+        return collect;
+    }
 
     /**
      * 入库操作

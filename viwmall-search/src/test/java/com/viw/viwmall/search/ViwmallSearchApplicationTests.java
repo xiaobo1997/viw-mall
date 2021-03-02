@@ -46,6 +46,50 @@ public class ViwmallSearchApplicationTests {
         System.out.println(client);
     }
 
+
+    /**
+     * （1）、方便检索{
+     *      skuId:1
+     *      spuId:11
+     *      skuTitle:华为xx
+     *      price:998
+     *      saleCount:99
+     *      attrs:[
+     *          {尺寸：5寸},
+     *          {CPU：高通945},
+     *          {分辨率：全高清}
+     *      ]
+     *  }
+     * 冗余：
+     *  100万*20=1000000*2KB=2000MB=2G 20
+     * （2）、分别创建索引
+     *    sku索引{
+     *     skuId:1
+     *     spuId:11
+     *     xxxxx
+     *    }
+     *
+     *    attr索引{
+     *        spuId:11,
+     *        attrs:[
+     *              {尺寸：5寸},
+     *              {CPU：高通945},
+     *              {分辨率：全高清}
+     *      ]
+     *    }
+     *
+     *   搜索 小米； 粮食，手机，电器。
+     *   10000个，4000个spu
+     *   分步，4000个spu对应的所有可能属性；
+     *   esClient： spuId:[4000个spuid] 4000*8=32000byte=32kb
+     *
+     *   32kb*10000=32000mb;=32GB
+     *
+     *
+     * @throws IOException
+     */
+
+
     /**
      * 复杂查询
      * https://xiaoboblog-bucket.oss-cn-hangzhou.aliyuncs.com/blog/image-20210302224432024.png

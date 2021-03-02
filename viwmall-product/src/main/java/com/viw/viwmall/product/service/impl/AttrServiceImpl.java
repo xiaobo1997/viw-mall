@@ -51,6 +51,16 @@ public class AttrServiceImpl extends ServiceImpl<AttrDao, AttrEntity> implements
     CategoryService categoryService;
 
     @Override
+    public List<Long> selectSearchAttrIds(List<Long> attrIds) {
+
+        /**
+         * SELECT attr_id FROM `pms_attr` WHERE attr_id IN(?) AND search_type = 1
+         */
+        return baseMapper.selectSearchAttrIds(attrIds);
+
+    }
+
+    @Override
     public void deleteRelation(AttrGroupRelationVo[] vos) {
         //relationDao.delete(new QueryWrapper<>().eq("attr_id",1L).eq("attr_group_id",1L));
         // 批量删除
