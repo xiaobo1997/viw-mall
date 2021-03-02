@@ -344,7 +344,7 @@ public class SpuInfoServiceImpl extends ServiceImpl<SpuInfoDao, SpuInfoEntity> i
             return esModel;
         }).collect(Collectors.toList());
 
-        //TODO 5、将数据发送给es进行保存；gulimall-search；
+        //TODO 5、将数据发送给es进行保存；viwmall-search；
         R r = searchFeignService.productStatusUp(upProducts);
         if(r.getCode() == 0){
             //远程调用成功
