@@ -1,4 +1,4 @@
-package com.viw.viwmall.product.controller;
+package com.viw.viwmall.product.app;
 
 import java.util.Arrays;
 import java.util.Map;
@@ -10,32 +10,32 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.viw.viwmall.product.entity.ProductAttrValueEntity;
-import com.viw.viwmall.product.service.ProductAttrValueService;
+import com.viw.viwmall.product.entity.SkuSaleAttrValueEntity;
+import com.viw.viwmall.product.service.SkuSaleAttrValueService;
 import com.viw.common.utils.PageUtils;
 import com.viw.common.utils.R;
 
 
 
 /**
- * spu属性值
+ * sku销售属性&值
  *
  * @author xiaobo
  * @email xiaobo97@163.com
- * @date 2021-02-07 17:01:08
+ * @date 2021-02-07 17:01:09
  */
 @RestController
-@RequestMapping("product/productattrvalue")
-public class ProductAttrValueController {
+@RequestMapping("product/skusaleattrvalue")
+public class SkuSaleAttrValueController {
     @Autowired
-    private ProductAttrValueService productAttrValueService;
+    private SkuSaleAttrValueService skuSaleAttrValueService;
 
     /**
      * 列表
      */
     @RequestMapping("/list")
     public R list(@RequestParam Map<String, Object> params){
-        PageUtils page = productAttrValueService.queryPage(params);
+        PageUtils page = skuSaleAttrValueService.queryPage(params);
 
         return R.ok().put("page", page);
     }
@@ -46,17 +46,17 @@ public class ProductAttrValueController {
      */
     @RequestMapping("/info/{id}")
     public R info(@PathVariable("id") Long id){
-		ProductAttrValueEntity productAttrValue = productAttrValueService.getById(id);
+		SkuSaleAttrValueEntity skuSaleAttrValue = skuSaleAttrValueService.getById(id);
 
-        return R.ok().put("productAttrValue", productAttrValue);
+        return R.ok().put("skuSaleAttrValue", skuSaleAttrValue);
     }
 
     /**
      * 保存
      */
     @RequestMapping("/save")
-    public R save(@RequestBody ProductAttrValueEntity productAttrValue){
-		productAttrValueService.save(productAttrValue);
+    public R save(@RequestBody SkuSaleAttrValueEntity skuSaleAttrValue){
+		skuSaleAttrValueService.save(skuSaleAttrValue);
 
         return R.ok();
     }
@@ -65,8 +65,8 @@ public class ProductAttrValueController {
      * 修改
      */
     @RequestMapping("/update")
-    public R update(@RequestBody ProductAttrValueEntity productAttrValue){
-		productAttrValueService.updateById(productAttrValue);
+    public R update(@RequestBody SkuSaleAttrValueEntity skuSaleAttrValue){
+		skuSaleAttrValueService.updateById(skuSaleAttrValue);
 
         return R.ok();
     }
@@ -76,7 +76,7 @@ public class ProductAttrValueController {
      */
     @RequestMapping("/delete")
     public R delete(@RequestBody Long[] ids){
-		productAttrValueService.removeByIds(Arrays.asList(ids));
+		skuSaleAttrValueService.removeByIds(Arrays.asList(ids));
 
         return R.ok();
     }

@@ -50,3 +50,4 @@ build/
 !/viwmall/.gitignore
 
 
+/viwmall-product/src/main/resources/static/

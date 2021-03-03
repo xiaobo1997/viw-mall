@@ -1,4 +1,4 @@
-package com.viw.viwmall.product.controller;
+package com.viw.viwmall.product.app;
 
 import java.util.Arrays;
 import java.util.Map;
@@ -10,32 +10,32 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.viw.viwmall.product.entity.SpuImagesEntity;
-import com.viw.viwmall.product.service.SpuImagesService;
+import com.viw.viwmall.product.entity.AttrAttrgroupRelationEntity;
+import com.viw.viwmall.product.service.AttrAttrgroupRelationService;
 import com.viw.common.utils.PageUtils;
 import com.viw.common.utils.R;
 
 
 
 /**
- * spu图片
+ * 属性&属性分组关联
  *
  * @author xiaobo
  * @email xiaobo97@163.com
- * @date 2021-02-07 17:01:08
+ * @date 2021-02-07 17:01:09
  */
 @RestController
-@RequestMapping("product/spuimages")
-public class SpuImagesController {
+@RequestMapping("product/attrattrgrouprelation")
+public class AttrAttrgroupRelationController {
     @Autowired
-    private SpuImagesService spuImagesService;
+    private AttrAttrgroupRelationService attrAttrgroupRelationService;
 
     /**
      * 列表
      */
     @RequestMapping("/list")
     public R list(@RequestParam Map<String, Object> params){
-        PageUtils page = spuImagesService.queryPage(params);
+        PageUtils page = attrAttrgroupRelationService.queryPage(params);
 
         return R.ok().put("page", page);
     }
@@ -46,17 +46,17 @@ public class SpuImagesController {
      */
     @RequestMapping("/info/{id}")
     public R info(@PathVariable("id") Long id){
-		SpuImagesEntity spuImages = spuImagesService.getById(id);
+		AttrAttrgroupRelationEntity attrAttrgroupRelation = attrAttrgroupRelationService.getById(id);
 
-        return R.ok().put("spuImages", spuImages);
+        return R.ok().put("attrAttrgroupRelation", attrAttrgroupRelation);
     }
 
     /**
      * 保存
      */
     @RequestMapping("/save")
-    public R save(@RequestBody SpuImagesEntity spuImages){
-		spuImagesService.save(spuImages);
+    public R save(@RequestBody AttrAttrgroupRelationEntity attrAttrgroupRelation){
+		attrAttrgroupRelationService.save(attrAttrgroupRelation);
 
         return R.ok();
     }
@@ -65,8 +65,8 @@ public class SpuImagesController {
      * 修改
      */
     @RequestMapping("/update")
-    public R update(@RequestBody SpuImagesEntity spuImages){
-		spuImagesService.updateById(spuImages);
+    public R update(@RequestBody AttrAttrgroupRelationEntity attrAttrgroupRelation){
+		attrAttrgroupRelationService.updateById(attrAttrgroupRelation);
 
         return R.ok();
     }
@@ -76,7 +76,7 @@ public class SpuImagesController {
      */
     @RequestMapping("/delete")
     public R delete(@RequestBody Long[] ids){
-		spuImagesService.removeByIds(Arrays.asList(ids));
+		attrAttrgroupRelationService.removeByIds(Arrays.asList(ids));
 
         return R.ok();
     }

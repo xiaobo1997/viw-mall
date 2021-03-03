@@ -1,4 +1,4 @@
-package com.viw.viwmall.product.controller;
+package com.viw.viwmall.product.app;
 
 import java.util.Arrays;
 import java.util.Map;
@@ -10,32 +10,32 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.viw.viwmall.product.entity.AttrAttrgroupRelationEntity;
-import com.viw.viwmall.product.service.AttrAttrgroupRelationService;
+import com.viw.viwmall.product.entity.ProductAttrValueEntity;
+import com.viw.viwmall.product.service.ProductAttrValueService;
 import com.viw.common.utils.PageUtils;
 import com.viw.common.utils.R;
 
 
 
 /**
- * 属性&属性分组关联
+ * spu属性值
  *
  * @author xiaobo
  * @email xiaobo97@163.com
- * @date 2021-02-07 17:01:09
+ * @date 2021-02-07 17:01:08
  */
 @RestController
-@RequestMapping("product/attrattrgrouprelation")
-public class AttrAttrgroupRelationController {
+@RequestMapping("product/productattrvalue")
+public class ProductAttrValueController {
     @Autowired
-    private AttrAttrgroupRelationService attrAttrgroupRelationService;
+    private ProductAttrValueService productAttrValueService;
 
     /**
      * 列表
      */
     @RequestMapping("/list")
     public R list(@RequestParam Map<String, Object> params){
-        PageUtils page = attrAttrgroupRelationService.queryPage(params);
+        PageUtils page = productAttrValueService.queryPage(params);
 
         return R.ok().put("page", page);
     }
@@ -46,17 +46,17 @@ public class AttrAttrgroupRelationController {
      */
     @RequestMapping("/info/{id}")
     public R info(@PathVariable("id") Long id){
-		AttrAttrgroupRelationEntity attrAttrgroupRelation = attrAttrgroupRelationService.getById(id);
+		ProductAttrValueEntity productAttrValue = productAttrValueService.getById(id);
 
-        return R.ok().put("attrAttrgroupRelation", attrAttrgroupRelation);
+        return R.ok().put("productAttrValue", productAttrValue);
     }
 
     /**
      * 保存
      */
     @RequestMapping("/save")
-    public R save(@RequestBody AttrAttrgroupRelationEntity attrAttrgroupRelation){
-		attrAttrgroupRelationService.save(attrAttrgroupRelation);
+    public R save(@RequestBody ProductAttrValueEntity productAttrValue){
+		productAttrValueService.save(productAttrValue);
 
         return R.ok();
     }
@@ -65,8 +65,8 @@ public class AttrAttrgroupRelationController {
      * 修改
      */
     @RequestMapping("/update")
-    public R update(@RequestBody AttrAttrgroupRelationEntity attrAttrgroupRelation){
-		attrAttrgroupRelationService.updateById(attrAttrgroupRelation);
+    public R update(@RequestBody ProductAttrValueEntity productAttrValue){
+		productAttrValueService.updateById(productAttrValue);
 
         return R.ok();
     }
@@ -76,7 +76,7 @@ public class AttrAttrgroupRelationController {
      */
     @RequestMapping("/delete")
     public R delete(@RequestBody Long[] ids){
-		attrAttrgroupRelationService.removeByIds(Arrays.asList(ids));
+		productAttrValueService.removeByIds(Arrays.asList(ids));
 
         return R.ok();
     }

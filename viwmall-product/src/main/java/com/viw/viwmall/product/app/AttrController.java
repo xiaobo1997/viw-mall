@@ -1,4 +1,4 @@
-package com.viw.viwmall.product.controller;
+package com.viw.viwmall.product.app;
 
 import java.util.Arrays;
 import java.util.List;
@@ -11,7 +11,6 @@ import com.viw.viwmall.product.vo.AttrVo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import com.viw.viwmall.product.entity.AttrEntity;
 import com.viw.viwmall.product.service.AttrService;
 import com.viw.common.utils.PageUtils;
 import com.viw.common.utils.R;
