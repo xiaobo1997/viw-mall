@@ -4,6 +4,7 @@ package com.viw.viwmall.product;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
@@ -27,6 +28,15 @@ public class ViwmallProductApplicationTests {
 
 //    @Autowired
 //    private OSSClient ossClient;
+
+    @Autowired
+    RedissonClient redissonClient;
+
+    @Test
+    public void testRedissionClient(){
+        System.out.println(redissonClient);
+        //org.redisson.Redisson@3ba46845
+    }
 
     @Test
     public void uploadImg() throws FileNotFoundException {
