@@ -8,6 +8,7 @@ import org.apache.commons.lang.StringUtils;
 import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.script.DefaultRedisScript;
@@ -239,8 +240,6 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
                     return catelog2Vo;
                 }).collect(Collectors.toList());
             }
-
-
             return catelog2Vos;
         }));
         return parent_cid;
@@ -302,9 +301,19 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
 
     /**
      * 级联更新所有关联的数据
+     * @CacheEvict:失效模式
+     *      * 1、同时进行多种缓存操作  @Caching
+     *      * 2、指定删除某个分区下的所有数据 @CacheEvict(value = "category",allEntries = true)如指定操作category分区
+     *      * 3、存储同一类型的数据，都可以指定成同一个分区。分区名默认就是缓存的前缀
      *
      * @param category
      */
+    //    @Caching(evict = {
+//            @CacheEvict(value = "category",key = "'getLevel1Categorys'"),
+//            @CacheEvict(value = "category",key = "'getCatalogJson'")
+//    })
+    //    @CachePut //双写模式
+    @CacheEvict(value = "category",allEntries = true) //失效模式
     @Transactional
     @Override
     public void updateCascade(CategoryEntity category) {
