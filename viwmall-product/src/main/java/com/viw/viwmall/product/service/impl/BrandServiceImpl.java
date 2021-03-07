@@ -5,6 +5,8 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.logging.log4j.util.Strings;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 import java.util.Map;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -28,6 +30,12 @@ public class BrandServiceImpl extends ServiceImpl<BrandDao, BrandEntity> impleme
     @Autowired
     CategoryBrandRelationService categoryBrandRelationService;
 
+    @Override
+    public List<BrandEntity> getBrandsByIds(List<Long> brandIds) {
+
+
+        return baseMapper.selectList(new QueryWrapper<BrandEntity>().in("brand_id",brandIds));
+    }
 
     /**
      * 默认自带分页工具类，不带任何查询条件

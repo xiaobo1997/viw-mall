@@ -35,7 +35,6 @@ public class SearchResult {
 
     //==========以上是返回给页面的所有信息============
 
-
     //面包屑导航数据
     private List<NavVo> navs = new ArrayList<>();
     private List<Long> attrIds = new ArrayList<>();

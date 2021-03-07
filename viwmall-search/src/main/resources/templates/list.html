@@ -2021,7 +2021,7 @@
         searchProducts("keyword", $("#keyword_input").val());
 
     }
-
+    //跳转翻页
     $(".page_a").click(function () {
         var pn = $(this).attr("pn");
 
@@ -2046,7 +2046,7 @@
 
         }
     }
-
+    // 动态添加查询条件的url   替换或添加
     function replaceAndAddParamVal(url, paramName, replaceVal,forceAdd) {
         var oUrl = url.toString();
         //1、如果没有就添加，有就替换；
@@ -2080,20 +2080,17 @@
 
 
     }
-
+    // 排序渲染
     $(".sort_a").click(function(){
         //1、当前被点击的元素变为选中状态
         //    color: #FFF; border-color: #e4393c; background: #e4393c;
         //改变当前元素以及兄弟元素的样式
         // changeStyle(this);
-
-        $(this).toggleClass("desc");
+        $(this).toggleClass("desc");//改变升降序，不加就是升序
         //2、跳转到指定位置 sort=skuPrice_asc/desc
         var sort = $(this).attr("sort");
         sort =  $(this).hasClass("desc")?sort+"_desc":sort+"_asc";
         location.href = replaceAndAddParamVal(location.href,"sort",sort);
-
-
         //禁用默认行为
         return false;
     });

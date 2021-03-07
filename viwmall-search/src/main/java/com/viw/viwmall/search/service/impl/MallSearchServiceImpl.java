@@ -350,7 +350,7 @@ public class MallSearchServiceImpl implements MallSearchService {
         result.setPageNavs(pageNavs);
 
 
-        //6、构建面包屑导航功能
+        //6、构建面包屑导航功能 (https://xiaoboblog-bucket.oss-cn-hangzhou.aliyuncs.com/blog/image-20210307104614163.png)
         if(param.getAttrs()!=null && param.getAttrs().size()>0){
             List<SearchResult.NavVo> collect = param.getAttrs().stream().map(attr -> {
                 //1、分析每个attrs传过来的查询参数值。
@@ -358,7 +358,7 @@ public class MallSearchServiceImpl implements MallSearchService {
 //            attrs=2_5存:6寸
                 String[] s = attr.split("_");
                 navVo.setNavValue(s[1]);
-                R r = productFeignService.attrInfo(Long.parseLong(s[0]));
+                R r = productFeignService.attrInfo(Long.parseLong(s[0]));// 按照id查询名字
                 result.getAttrIds().add(Long.parseLong(s[0]));
                 if(r.getCode() == 0){
                     AttrResponseVo data = r.getData("attr", new TypeReference<AttrResponseVo>() {
@@ -382,7 +382,7 @@ public class MallSearchServiceImpl implements MallSearchService {
             result.setNavs(collect);
         }
 
-        //品牌，分类
+        //品牌，分类      增加面包屑导航
         if(param.getBrandId()!=null && param.getBrandId().size()>0){
             List<SearchResult.NavVo> navs = result.getNavs();
             SearchResult.NavVo navVo = new SearchResult.NavVo();
@@ -397,18 +397,19 @@ public class MallSearchServiceImpl implements MallSearchService {
                 String replace = "";
                 for (BrandVo brandVo : brand) {
                     buffer.append(brandVo.getBrandName()+";");
+                    // 解决url编码问题
                     replace = replaceQueryString(param, brandVo.getBrandId()+"","brandId");
                 }
                 navVo.setNavValue(buffer.toString());
                 navVo.setLink("http://search.viwmall.com/list.html?"+replace);
             }
-
             navs.add(navVo);
         }
         //TODO 分类：不需要导航取消
         return result;
     }
 
+    //解决url编码问题
     private String replaceQueryString(SearchParam param, String value,String key) {
         String encode = null;
         try {
