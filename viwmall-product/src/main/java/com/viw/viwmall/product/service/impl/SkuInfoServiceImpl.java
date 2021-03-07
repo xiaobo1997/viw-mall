@@ -59,6 +59,7 @@ public class SkuInfoServiceImpl extends ServiceImpl<SkuInfoDao, SkuInfoEntity> i
     public SkuItemVo item(Long skuId) throws ExecutionException, InterruptedException {
         SkuItemVo skuItemVo  = new SkuItemVo();
 
+        // CompletableFuture异步编排
         CompletableFuture<SkuInfoEntity> infoFuture = CompletableFuture.supplyAsync(() -> {
             //1、sku基本信息获取  pms_sku_info
             SkuInfoEntity info = getById(skuId);
@@ -67,7 +68,7 @@ public class SkuInfoServiceImpl extends ServiceImpl<SkuInfoDao, SkuInfoEntity> i
         }, executor);
 
         CompletableFuture<Void> saleAttrFuture = infoFuture.thenAcceptAsync((res) -> {
-            //3、获取spu的销售属性组合。
+            //3、获取spu的销售属性组合。 依赖infoFuture。infoFuture结束就可以继续下面业务处理
             List<SkuItemSaleAttrVo> saleAttrVos = skuSaleAttrValueService.getSaleAttrsBySpuId(res.getSpuId());
             skuItemVo.setSaleAttr(saleAttrVos);
         }, executor);
