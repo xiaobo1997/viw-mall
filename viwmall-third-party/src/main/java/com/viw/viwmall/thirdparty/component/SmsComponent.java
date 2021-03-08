@@ -1,43 +1,44 @@
-package com.viw.viwmall.thirdparty;
+package com.viw.viwmall.thirdparty.component;
 
-import com.aliyun.oss.OSSClient;
 import com.viw.viwmall.thirdparty.util.HttpUtils;
+import lombok.Data;
 import org.apache.http.HttpResponse;
 import org.apache.http.util.EntityUtils;
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.stereotype.Component;
 
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 
-@SpringBootTest
-class ViwmallThirdPartyApplicationTests {
+/**
+ * @Author: xhb
+ * @Email: xiaobo97@163.com
+ * @gitee:https://gitee.com/xiaobo97
+ * @Date: 2021/3/8 21:49
+ * @description: 短信验证码组件
+ */
+@ConfigurationProperties(prefix = "spring.cloud.alicloud.sms")
+@Data
+@Component
+public class SmsComponent {
 
-    @Test
-    void contextLoads() {
-    }
+    private String host;
+    private String path;
+    private String skin;
+    private String sign;
+    private String appcode;
 
-    @Autowired
-    private OSSClient ossClient;
-
-    @Test
-    public void sendSms(){
-        String host = "https://smsmsgs.market.alicloudapi.com";
-        String path = "/sms/";
+    public void sendSmsCode(String phone,String code){
         String method = "GET";
         String appcode = "93b7e19861a24c519a7548b17dc16d75";
         Map<String, String> headers = new HashMap<String, String>();
         //最后在header中的格式(中间是英文空格)为Authorization:APPCODE 83359fd73fe94948385f570e3c139105
         headers.put("Authorization", "APPCODE " + appcode);
         Map<String, String> querys = new HashMap<String, String>();
-        querys.put("code", "6789");
-        querys.put("phone", "13081668512");
-        querys.put("skin", "1");
-        querys.put("sign", "175622");
+        querys.put("code", code);
+        querys.put("phone", phone);
+        querys.put("skin", skin);
+        querys.put("sign", sign);
         //JDK 1.8示例代码请在这里下载：  http://code.fegine.com/Tools.zip
 
         try {
@@ -50,13 +51,4 @@ class ViwmallThirdPartyApplicationTests {
             e.printStackTrace();
         }
     }
-
-    @Test
-    public void uploadImg() throws FileNotFoundException {
-        FileInputStream fileInputStream = new FileInputStream("D:\\doc\\1.png");
-        ossClient.putObject("xiaobo-project","001.png",fileInputStream);
-        ossClient.shutdown();
-        System.out.println("OK");
-    }
-
 }

@@ -1,18 +1,30 @@
 package com.viw.viwmall.auth.controller;
 
 import com.alibaba.fastjson.TypeReference;
+import com.viw.common.constant.AuthServerConstant;
+import com.viw.common.exception.BizCodeEnume;
 import com.viw.common.utils.R;
+import com.viw.viwmall.auth.feign.MemberFeignService;
+import com.viw.viwmall.auth.feign.ThirdPartFeignService;
+import com.viw.viwmall.auth.vo.UserRegistVo;
+import org.apache.commons.lang.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 /**
@@ -25,21 +37,44 @@ import java.util.stream.Collectors;
 @Controller
 public class LoginController {
 
+    @Autowired
+    ThirdPartFeignService thirdPartFeignService;
+
+    @Autowired
+    StringRedisTemplate redisTemplate;
+
+    @Autowired
+    MemberFeignService memberFeignService;
 
     /**
-     * 登录
-     * @param session
+     * 获取短信验证码
+     * @param phone
      * @return
      */
-    @GetMapping("/login.html")
-    public String loginPage(HttpSession session){
-        Object attribute = session.getAttribute(AuthServerConstant.LOGIN_USER);
-        if(attribute == null){
-            //没登录
-            return "login";
-        }else {
-            return "redirect:http://viwmall.com";
+    @ResponseBody
+    @GetMapping("/sms/sendcode")
+    public R sendCode(@RequestParam("phone") String phone){
+
+        //TODO 1、接口防刷。
+        String redisCode = redisTemplate.opsForValue().get(AuthServerConstant.SMS_CODE_CACHE_PREFIX + phone);
+        if(!StringUtils.isEmpty(redisCode)){
+            long l = Long.parseLong(redisCode.split("_")[1]);
+            if(System.currentTimeMillis() - l < 60000){
+                //60秒内不能再发
+                return R.error(BizCodeEnume.SMS_CODE_EXCEPTION.getCode(),BizCodeEnume.SMS_CODE_EXCEPTION.getMsg());
+            }
         }
+
+
+        //2、验证码的再次校验。redis。存key-phone，value-code   sms:code:17512080612 -> 45678
+        String code = UUID.randomUUID().toString().substring(0, 5);
+        String substring = code+"_"+System.currentTimeMillis();
+        //redis缓存验证码，防止同一个phone在60秒内再次发送验证码
+
+        redisTemplate.opsForValue().set(AuthServerConstant.SMS_CODE_CACHE_PREFIX+phone,substring,10, TimeUnit.MINUTES);
+
+        thirdPartFeignService.sendCode(phone,code);
+        return R.ok();
     }
 
 

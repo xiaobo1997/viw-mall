@@ -3,6 +3,9 @@ package com.viw.viwmall.member.service;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.viw.common.utils.PageUtils;
 import com.viw.viwmall.member.entity.MemberEntity;
+import com.viw.viwmall.member.exception.PhoneExsitException;
+import com.viw.viwmall.member.exception.UsernameExistException;
+import com.viw.viwmall.member.vo.MemberRegistVo;
 
 import java.util.Map;
 
@@ -16,5 +19,12 @@ import java.util.Map;
 public interface MemberService extends IService<MemberEntity> {
 
     PageUtils queryPage(Map<String, Object> params);
+
+    void regist(MemberRegistVo vo);
+
+    void checkPhoneUnique(String phone) throws PhoneExsitException;
+
+    void checkUsernameUnique(String username) throws UsernameExistException;
+
 }
 
