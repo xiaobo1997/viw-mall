@@ -8,6 +8,7 @@ import com.viw.viwmall.member.exception.PhoneExsitException;
 import com.viw.viwmall.member.exception.UsernameExistException;
 import com.viw.viwmall.member.vo.MemberLoginVo;
 import com.viw.viwmall.member.vo.MemberRegistVo;
+import com.viw.viwmall.member.vo.SocialUser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -31,7 +32,29 @@ public class MemberController {
     @Autowired
     private MemberService memberService;
 
+    /**
+     * 注册
+     * @param socialUser
+     * @return
+     * @throws Exception
+     */
+    @PostMapping("/oauth2/login")
+    public R oauthlogin(@RequestBody SocialUser socialUser) throws Exception {
 
+        MemberEntity entity =  memberService.login(socialUser);
+        if(entity!=null){
+            //TODO 1、登录成功处理
+            return R.ok().setData(entity);
+        }else{
+            return R.error(BizCodeEnume.LOGINACCT_PASSWORD_INVAILD_EXCEPTION.getCode(),BizCodeEnume.LOGINACCT_PASSWORD_INVAILD_EXCEPTION.getMsg());
+        }
+    }
+
+    /**
+     * 登录
+     * @param vo
+     * @return
+     */
     @PostMapping("/login")
     public R login(@RequestBody MemberLoginVo vo){
 
