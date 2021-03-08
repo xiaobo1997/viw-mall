@@ -5,6 +5,7 @@ import com.viw.common.utils.PageUtils;
 import com.viw.viwmall.member.entity.MemberEntity;
 import com.viw.viwmall.member.exception.PhoneExsitException;
 import com.viw.viwmall.member.exception.UsernameExistException;
+import com.viw.viwmall.member.vo.MemberLoginVo;
 import com.viw.viwmall.member.vo.MemberRegistVo;
 
 import java.util.Map;
@@ -26,5 +27,6 @@ public interface MemberService extends IService<MemberEntity> {
 
     void checkUsernameUnique(String username) throws UsernameExistException;
 
+    MemberEntity login(MemberLoginVo vo);
 }
 

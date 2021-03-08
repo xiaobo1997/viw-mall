@@ -4,6 +4,7 @@ import com.viw.viwmall.member.dao.MemberLevelDao;
 import com.viw.viwmall.member.entity.MemberLevelEntity;
 import com.viw.viwmall.member.exception.PhoneExsitException;
 import com.viw.viwmall.member.exception.UsernameExistException;
+import com.viw.viwmall.member.vo.MemberLoginVo;
 import com.viw.viwmall.member.vo.MemberRegistVo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -87,7 +88,32 @@ public class MemberServiceImpl extends ServiceImpl<MemberDao, MemberEntity> impl
         if (count > 0) {
             throw new UsernameExistException();
         }
+    }
 
+    @Override
+    public MemberEntity login(MemberLoginVo vo) {
+        String loginacct = vo.getLoginacct();
+        String password = vo.getPassword(); //123456
+
+        //1、去数据库查询 SELECT * FROM `ums_member` WHERE username=? OR mobile=?
+        MemberDao memberDao = this.baseMapper;
+        MemberEntity entity = memberDao.selectOne(new QueryWrapper<MemberEntity>().eq("username", loginacct)
+                .or().eq("mobile", loginacct));
+        if (entity == null) {
+            //登录失败
+            return null;
+        } else {
+            //1、获取到数据库的password  $2a$10$2xOI1.2DTQxpWeWd3Rk0qOVPTpauodlYkafTjNb4LOMuS1zBEZc5K
+            String passwordDb = entity.getPassword();
+            BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+            //2、密码匹配
+            boolean matches = passwordEncoder.matches(password, passwordDb);
+            if (matches) {
+                return entity;
+            } else {
+                return null;
+            }
+        }
     }
 
 }

@@ -6,6 +6,7 @@ import java.util.Map;
 import com.viw.common.exception.BizCodeEnume;
 import com.viw.viwmall.member.exception.PhoneExsitException;
 import com.viw.viwmall.member.exception.UsernameExistException;
+import com.viw.viwmall.member.vo.MemberLoginVo;
 import com.viw.viwmall.member.vo.MemberRegistVo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -29,6 +30,18 @@ import com.viw.common.utils.R;
 public class MemberController {
     @Autowired
     private MemberService memberService;
+
+
+    @PostMapping("/login")
+    public R login(@RequestBody MemberLoginVo vo){
+
+        MemberEntity entity =  memberService.login(vo);
+        if(entity!=null){
+            return R.ok().setData(entity);
+        }else{
+            return R.error(BizCodeEnume.LOGINACCT_PASSWORD_INVAILD_EXCEPTION.getCode(),BizCodeEnume.LOGINACCT_PASSWORD_INVAILD_EXCEPTION.getMsg());
+        }
+    }
 
 
     @PostMapping("/regist")

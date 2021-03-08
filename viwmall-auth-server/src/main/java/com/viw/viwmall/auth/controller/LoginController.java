@@ -4,8 +4,10 @@ import com.alibaba.fastjson.TypeReference;
 import com.viw.common.constant.AuthServerConstant;
 import com.viw.common.exception.BizCodeEnume;
 import com.viw.common.utils.R;
+import com.viw.common.vo.MemberRespVo;
 import com.viw.viwmall.auth.feign.MemberFeignService;
 import com.viw.viwmall.auth.feign.ThirdPartFeignService;
+import com.viw.viwmall.auth.vo.UserLoginVo;
 import com.viw.viwmall.auth.vo.UserRegistVo;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -150,6 +152,43 @@ public class LoginController {
             redirectAttributes.addFlashAttribute("errors",errors);
             //校验出错，转发到注册页
             return "redirect:http://auth.viwmall.com/reg.html";
+        }
+    }
+
+
+    @GetMapping("/login.html")
+    public String loginPage(HttpSession session){
+        Object attribute = session.getAttribute(AuthServerConstant.LOGIN_USER);
+        if(attribute == null){
+            //没登录
+            return "login";
+        }else {
+            return "redirect:http://viwmall.com";
+        }
+
+
+
+    }
+
+    @PostMapping("/login")
+    public String login(UserLoginVo vo, RedirectAttributes redirectAttributes,
+                        HttpSession session){
+
+
+        //远程登录
+        R login = memberFeignService.login(vo);
+        if(login.getCode()==0){
+
+            MemberRespVo data = login.getData("data", new TypeReference<MemberRespVo>() {
+            });
+            ////成功放到session中
+            session.setAttribute(AuthServerConstant.LOGIN_USER,data);
+            return "redirect:http://viwmall.com";
+        }else {
+            Map<String,String > errors = new HashMap<>();
+            errors.put("msg",login.getData("msg",new TypeReference<String>(){}));
+            redirectAttributes.addFlashAttribute("errors",errors);
+            return "redirect:http://auth.viwmall.com/login.html";
         }
     }
 }
