@@ -76,7 +76,7 @@ public class OAuth2Controller {
                 //1、第一次使用session；命令浏览器保存卡号。JSESSIONID这个cookie；
                 //以后浏览器访问哪个网站就会带上这个网站的cookie；
                 //子域之间； viwmall.com  auth.viwmall.com  order.viwmall.com
-                //发卡的时候(指定域名为父域名)，即使是子域系统发的卡，也能让父域直接使用。
+                //发卡的时候(指定域名为父域名)，即使是子域系统发的卡，也能让父域直接使用。修改session的作用域
                 //TODO 1、默认发的令牌。session=dsajkdjl。作用域：当前域；（解决子域session共享问题）
                 //TODO 2、使用JSON的序列化方式来序列化对象数据到redis中
                 session.setAttribute("loginUser",data);

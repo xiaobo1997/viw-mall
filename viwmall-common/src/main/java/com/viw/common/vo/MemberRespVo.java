@@ -11,7 +11,9 @@ import java.util.Date;
  * @Email: xiaobo97@163.com
  * @gitee:https://gitee.com/xiaobo97
  * @Date: 2021/3/8 23:08
- * @description:
+ * @description:  分布式session问题：
+ * 1.springsession  把session存redis中，序列化和反序列化
+ * 2.MemberRespVo是存redis的用户登录信息对象
  */
 
 @ToString
