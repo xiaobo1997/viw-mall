@@ -20,7 +20,7 @@ public class ViwmallSessionConfig {
     public CookieSerializer cookieSerializer(){
         DefaultCookieSerializer cookieSerializer = new DefaultCookieSerializer();
 
-        cookieSerializer.setDomainName("gulimall.com");
+        cookieSerializer.setDomainName("viwmall.com");
         cookieSerializer.setCookieName("GULISESSION");
 
         return cookieSerializer;
