@@ -2,6 +2,7 @@ package com.viw.viwmall.cart.controller;
 
 import com.viw.viwmall.cart.service.CartService;
 import com.viw.viwmall.cart.vo.Cart;
+import com.viw.viwmall.cart.vo.CartItem;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -24,12 +25,21 @@ public class CartController {
     @Autowired
     CartService cartService;
 
+
+    @GetMapping("/checkItem")
+    public String checkItem(@RequestParam("skuId") Long skuId,
+                            @RequestParam("check") Integer check){
+        cartService.checkItem(skuId,check);
+
+        return "redirect:http://cart.gulimall.com/cart.html";
+    }
+
     /**
      * 添加商品到购物车
      * RedirectAttributes ra
      *      ra.addFlashAttribute();将数据放在session里面可以在页面取出，但是只能取一次
      *      ra.addAttribute("skuId",skuId);将数据放在url后面
-     * @return
+     * @return  RedirectAttributes重定向携带数据
      */
     @GetMapping("/addToCart")
     public String addToCart(@RequestParam("skuId") Long skuId,
@@ -59,9 +69,25 @@ public class CartController {
         //1、快速得到用户信息，id，user-key
 //        System.out.println(userInfoTo);
 
-//        Cart cart = cartService.getCart();
-//        model.addAttribute("cart",cart);
+        Cart cart = cartService.getCart();
+        model.addAttribute("cart",cart);
         return "cartList";
     }
+
+
+    /**
+     * 跳转到成功页 防止重复添加购物车
+     * @param skuId
+     * @param model
+     * @return
+     */
+    @GetMapping("/addToCartSuccess.html")
+    public String addToCartSuccessPage(@RequestParam("skuId") Long skuId,Model model){
+        //重定向到成功页面。再次查询购物车数据即可
+        CartItem item = cartService.getCartItem(skuId);
+        model.addAttribute("item",item);
+        return "success";
+    }
+
 
 }

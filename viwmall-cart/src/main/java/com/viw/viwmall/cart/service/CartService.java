@@ -27,34 +27,35 @@ public interface CartService {
     CartItem addToCart(Long skuId, Integer num) throws ExecutionException, InterruptedException;
 
 
-//
-//    /**
-//     * 获取购物车中某个购物项
-//     * @param skuId
-//     * @return
-//     */
-//    CartItem getCartItem(Long skuId);
-//
-//
-//    /**
-//     * 获取整个购物车
-//     * @return
-//     */
-//    Cart getCart() throws ExecutionException, InterruptedException;
-//
-//    /**
-//     * 清空购物车数据
-//     * @param cartkey
-//     */
-//    void clearCart(String cartkey);
-//
-//    /**
-//     * 勾选购物项
-//     * @param skuId
-//     * @param check
-//     */
-//    void checkItem(Long skuId, Integer check);
-//
+
+
+    /**
+     * 获取购物车中某个购物项
+     * @param skuId
+     * @return
+     */
+    CartItem getCartItem(Long skuId);
+
+
+    /**
+     * 获取整个购物车
+     * @return
+     */
+    Cart getCart() throws ExecutionException, InterruptedException;
+
+    /**
+     * 清空购物车数据
+     * @param cartkey
+     */
+    void clearCart(String cartkey);
+
+    /**
+     * 勾选购物项
+     * @param skuId
+     * @param check
+     */
+    void checkItem(Long skuId, Integer check);
+
 //
 //    /**
 //     * 修改购物项数量
@@ -68,7 +69,7 @@ public interface CartService {
 //     * @param skuId
 //     */
 //    void deleteItem(Long skuId);
-//
+
 //
 //    List<CartItem> getUserCartItems();
 }
