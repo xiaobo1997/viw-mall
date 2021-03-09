@@ -56,20 +56,20 @@ public interface CartService {
      */
     void checkItem(Long skuId, Integer check);
 
-//
-//    /**
-//     * 修改购物项数量
-//     * @param skuId
-//     * @param num
-//     */
-//    void changeItemCount(Long skuId, Integer num);
-//
-//    /**
-//     * 删除购物项
-//     * @param skuId
-//     */
-//    void deleteItem(Long skuId);
 
-//
-//    List<CartItem> getUserCartItems();
+    /**
+     * 修改购物项数量
+     * @param skuId
+     * @param num
+     */
+    void changeItemCount(Long skuId, Integer num);
+
+    /**
+     * 删除购物项
+     * @param skuId
+     */
+    void deleteItem(Long skuId);
+
+
+    List<CartItem> getUserCartItems();
 }
