@@ -65,7 +65,7 @@ public class OrderItemServiceImpl extends ServiceImpl<OrderItemDao, OrderItemEnt
 //        Thread.sleep(3000);
         System.out.println("消息处理完成=>"+content.getName());
         //channel内按顺序自增的。
-        long deliveryTag = message.getMessageProperties().getDeliveryTag();
+        long deliveryTag = message.getMessageProperties().getDeliveryTag();// 获取信息的deliveryTag，这个可以给后面ac确认用
         System.out.println("deliveryTag==>"+deliveryTag);
 
         //签收货物,非批量模式
