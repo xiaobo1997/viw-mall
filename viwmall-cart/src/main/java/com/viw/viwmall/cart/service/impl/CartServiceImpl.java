@@ -48,10 +48,13 @@ public class CartServiceImpl implements CartService {
 
     @Override
     public List<CartItem> getUserCartItems() {
+        // 通过拦截器直接获取用户信息
         UserInfoTo userInfoTo = CartInterceptor.threadLocal.get();
+        // 一定是登录用户， 为null说明用户没有登录
         if(userInfoTo.getUserId()==null){
             return null;
         }else{
+            // 操作哪个购物车，指定哪个购物车
             String cartKey = CART_PREFIX + userInfoTo.getUserId();
             List<CartItem> cartItems = getCartItems(cartKey);
 
@@ -59,6 +62,8 @@ public class CartServiceImpl implements CartService {
             List<CartItem> collect = cartItems.stream()
                     .filter(item -> item.getCheck())
                     .map(item->{
+//                        getCheck() 需要先为true
+                        // 调用商品服务 查询商品价格（需要最新的价格，而不是redis中的价格）
                         R price = productFeignService.getPrice(item.getSkuId());
                         //TODO 1、更新为最新价格
                         String data = (String) price.get("data");

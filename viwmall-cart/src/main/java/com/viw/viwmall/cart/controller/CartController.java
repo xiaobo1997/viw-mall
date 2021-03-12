@@ -27,10 +27,13 @@ public class CartController {
     @Autowired
     CartService cartService;
 
+    /**
+     * 获取当前用户中的所有购物项
+     * @return
+     */
     @GetMapping("/currentUserCartItems")
     @ResponseBody
     public List<CartItem> getCurrentUserCartItems(){
-
         return cartService.getUserCartItems();
     }
 
