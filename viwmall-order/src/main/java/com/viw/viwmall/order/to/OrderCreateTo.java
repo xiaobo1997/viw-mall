@@ -14,15 +14,15 @@ import java.util.List;
  * @Date: 2021/3/13 15:06
  * @description:
  */
-//@Data
-//public class OrderCreateTo {
-//
-//
-//    private OrderEntity order;
-//
-//    private List<OrderItemEntity> orderItems;
-//
-//    private BigDecimal payPrice;//订单计算的应付价格
-//
-//    private BigDecimal fare;//运费
-//}
+@Data
+public class OrderCreateTo {
+
+
+    private OrderEntity order;
+
+    private List<OrderItemEntity> orderItems;
+
+    private BigDecimal payPrice;//订单计算的应付价格
+
+    private BigDecimal fare;//运费
+}

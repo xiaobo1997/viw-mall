@@ -1,10 +1,13 @@
 package com.viw.viwmall.order.service.impl;
 
 import com.alibaba.fastjson.TypeReference;
+import com.baomidou.mybatisplus.core.toolkit.IdWorker;
 import com.viw.common.exception.NoStockException;
 import com.viw.common.utils.R;
 import com.viw.common.vo.MemberRespVo;
 import com.viw.viwmall.order.constant.OrderConstant;
+import com.viw.viwmall.order.entity.OrderItemEntity;
+import com.viw.viwmall.order.enume.OrderStatusEnum;
 import com.viw.viwmall.order.feign.CartFeignService;
 import com.viw.viwmall.order.feign.MemberFeignService;
 import com.viw.viwmall.order.feign.ProductFeignService;
@@ -12,6 +15,7 @@ import com.viw.viwmall.order.feign.WmsFeignService;
 import com.viw.viwmall.order.interceptor.LoginUserInterceptor;
 import com.viw.viwmall.order.service.OrderItemService;
 import com.viw.viwmall.order.service.PaymentInfoService;
+import com.viw.viwmall.order.to.OrderCreateTo;
 import com.viw.viwmall.order.vo.*;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,6 +44,7 @@ import com.viw.viwmall.order.dao.OrderDao;
 import com.viw.viwmall.order.entity.OrderEntity;
 import com.viw.viwmall.order.service.OrderService;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.RequestContextHolder;
 
@@ -172,7 +177,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, OrderEntity> impleme
         response.setCode(0);
 
 
-         // 原对比令牌(不可取，需要保证原子性)
+        // 原对比令牌(不可取，需要保证原子性)
 //        String redisToken = redisTemplate.opsForValue().get(OrderConstant.USER_ORDER_TOKEN_PREFIX + memberRespVo.getId());
 //        if(orderToken!=null && orderToken.equals(redisToken)){
 //            //令牌验证通过
@@ -246,9 +251,127 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, OrderEntity> impleme
                 response.setCode(2);
                 return response;
             }
+        }
+    }
 
+    /**
+     * 创建订单
+     * @return
+     */
+    private OrderCreateTo createOrder() {
+        OrderCreateTo createTo = new OrderCreateTo();
+        //1、生成订单号
+        String orderSn = IdWorker.getTimeId();
+        //创建订单号
+        OrderEntity orderEntity = buildOrder(orderSn);
+
+        //2、获取到所有的订单项
+        List<OrderItemEntity> itemEntities = buildOrderItems(orderSn);
+
+        //3、计算价格、积分等相关
+        computePrice(orderEntity, itemEntities);
+
+        createTo.setOrder(orderEntity);
+        createTo.setOrderItems(itemEntities);
+
+        return createTo;
+    }
+
+    /**
+     * 创建订单
+     * @param orderSn
+     * @return
+     */
+    private OrderEntity buildOrder(String orderSn) {
+        MemberRespVo respVo = LoginUserInterceptor.loginUser.get();
+        OrderEntity entity = new OrderEntity();
+        entity.setOrderSn(orderSn);
+        entity.setMemberId(respVo.getId());
+
+
+        OrderSubmitVo submitVo = confirmVoThreadLocal.get();
+        //获取收货地址信息  得到运费
+        R fare = wmsFeignService.getFare(submitVo.getAddrId());
+        FareVo fareResp = fare.getData(new TypeReference<FareVo>() {
+        });
+
+        //设置运费金额信息
+        entity.setFreightAmount(fareResp.getFare());
+        //设置收货人信息
+        entity.setReceiverCity(fareResp.getAddress().getCity());
+        entity.setReceiverDetailAddress(fareResp.getAddress().getDetailAddress());
+        entity.setReceiverName(fareResp.getAddress().getName());
+        entity.setReceiverPhone(fareResp.getAddress().getPhone());
+        entity.setReceiverPostCode(fareResp.getAddress().getPostCode());
+        entity.setReceiverProvince(fareResp.getAddress().getProvince());
+        entity.setReceiverRegion(fareResp.getAddress().getRegion());
+
+        //设置订单的相关状态信息
+        entity.setStatus(OrderStatusEnum.CREATE_NEW.getCode());
+        entity.setAutoConfirmDay(7);
+        return entity;
+    }
+    /**
+     * 构建所有订单项数据
+     *
+     * @return
+     */
+    private List<OrderItemEntity> buildOrderItems(String orderSn) {
+        //最后确定每个购物项的价格
+        List<OrderItemVo> currentUserCartItems = cartFeignService.getCurrentUserCartItems();
+        if (currentUserCartItems != null && currentUserCartItems.size() > 0) {
+            List<OrderItemEntity> itemEntities = currentUserCartItems.stream().map(cartItem -> {
+                OrderItemEntity itemEntity = buildOrderItem(cartItem);
+                itemEntity.setOrderSn(orderSn);
+                return itemEntity;
+            }).collect(Collectors.toList());
+            return itemEntities;
         }
 
-
+        return null;
     }
+    /**
+     * 构建某一个订单项
+     * @param cartItem
+     * @return
+     */
+//    private OrderItemEntity buildOrderItem(OrderItemVo cartItem) {
+//        OrderItemEntity itemEntity = new OrderItemEntity();
+//        //1、订单信息：订单号 v
+//        //2、商品的SPU信息  V
+//        Long skuId = cartItem.getSkuId();
+//        R r = productFeignService.getSpuInfoBySkuId(skuId);
+//        SpuInfoVo data = r.getData(new TypeReference<SpuInfoVo>() {
+//        });
+//        itemEntity.setSpuId(data.getId());
+//        itemEntity.setSpuBrand(data.getBrandId().toString());
+//        itemEntity.setSpuName(data.getSpuName());
+//        itemEntity.setCategoryId(data.getCatalogId());
+//        //3、商品的sku信息  v
+//        itemEntity.setSkuId(cartItem.getSkuId());
+//        itemEntity.setSkuName(cartItem.getTitle());
+//        itemEntity.setSkuPic(cartItem.getImage());
+//        itemEntity.setSkuPrice(cartItem.getPrice());
+//        String skuAttr = StringUtils.collectionToDelimitedString(cartItem.getSkuAttr(), ";");
+//        itemEntity.setSkuAttrsVals(skuAttr);
+//        itemEntity.setSkuQuantity(cartItem.getCount());
+//        //4、优惠信息[不做]
+//        //5、积分信息
+//        itemEntity.setGiftGrowth(cartItem.getPrice().multiply(new BigDecimal(cartItem.getCount().toString())).intValue());
+//        itemEntity.setGiftIntegration(cartItem.getPrice().multiply(new BigDecimal(cartItem.getCount().toString())).intValue());
+//        //6、订单项的价格信息
+//        itemEntity.setPromotionAmount(new BigDecimal("0"));
+//        itemEntity.setCouponAmount(new BigDecimal("0"));
+//        itemEntity.setIntegrationAmount(new BigDecimal("0"));
+//        //当前订单项的实际金额。 总额-各种优惠
+//        BigDecimal orign = itemEntity.getSkuPrice().multiply(new BigDecimal(itemEntity.getSkuQuantity().toString()));
+//        BigDecimal subtract = orign.subtract(itemEntity.getCouponAmount())
+//                .subtract(itemEntity.getPromotionAmount())
+//                .subtract(itemEntity.getIntegrationAmount());
+//        itemEntity.setRealAmount(subtract);
+//
+//        return itemEntity;
+//    }
+
+
 }
