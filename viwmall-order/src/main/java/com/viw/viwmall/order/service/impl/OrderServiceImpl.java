@@ -312,17 +312,17 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, OrderEntity> impleme
         return entity;
     }
     /**
-     * 构建所有订单项数据
+     * 构建订单号构建所有订单项数据
      *
      * @return
      */
     private List<OrderItemEntity> buildOrderItems(String orderSn) {
-        //最后确定每个购物项的价格
+        //最后一次确定每个购物项的价格 （再查询一次）
         List<OrderItemVo> currentUserCartItems = cartFeignService.getCurrentUserCartItems();
         if (currentUserCartItems != null && currentUserCartItems.size() > 0) {
             List<OrderItemEntity> itemEntities = currentUserCartItems.stream().map(cartItem -> {
                 OrderItemEntity itemEntity = buildOrderItem(cartItem);
-                itemEntity.setOrderSn(orderSn);
+                itemEntity.setOrderSn(orderSn); // 保存订单号
                 return itemEntity;
             }).collect(Collectors.toList());
             return itemEntities;
@@ -331,47 +331,47 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, OrderEntity> impleme
         return null;
     }
     /**
-     * 构建某一个订单项
+     * 构建某一个订单项  oms_order_item
      * @param cartItem
      * @return
      */
-//    private OrderItemEntity buildOrderItem(OrderItemVo cartItem) {
-//        OrderItemEntity itemEntity = new OrderItemEntity();
-//        //1、订单信息：订单号 v
-//        //2、商品的SPU信息  V
-//        Long skuId = cartItem.getSkuId();
-//        R r = productFeignService.getSpuInfoBySkuId(skuId);
-//        SpuInfoVo data = r.getData(new TypeReference<SpuInfoVo>() {
-//        });
-//        itemEntity.setSpuId(data.getId());
-//        itemEntity.setSpuBrand(data.getBrandId().toString());
-//        itemEntity.setSpuName(data.getSpuName());
-//        itemEntity.setCategoryId(data.getCatalogId());
-//        //3、商品的sku信息  v
-//        itemEntity.setSkuId(cartItem.getSkuId());
-//        itemEntity.setSkuName(cartItem.getTitle());
-//        itemEntity.setSkuPic(cartItem.getImage());
-//        itemEntity.setSkuPrice(cartItem.getPrice());
-//        String skuAttr = StringUtils.collectionToDelimitedString(cartItem.getSkuAttr(), ";");
-//        itemEntity.setSkuAttrsVals(skuAttr);
-//        itemEntity.setSkuQuantity(cartItem.getCount());
-//        //4、优惠信息[不做]
-//        //5、积分信息
-//        itemEntity.setGiftGrowth(cartItem.getPrice().multiply(new BigDecimal(cartItem.getCount().toString())).intValue());
-//        itemEntity.setGiftIntegration(cartItem.getPrice().multiply(new BigDecimal(cartItem.getCount().toString())).intValue());
-//        //6、订单项的价格信息
-//        itemEntity.setPromotionAmount(new BigDecimal("0"));
-//        itemEntity.setCouponAmount(new BigDecimal("0"));
-//        itemEntity.setIntegrationAmount(new BigDecimal("0"));
-//        //当前订单项的实际金额。 总额-各种优惠
-//        BigDecimal orign = itemEntity.getSkuPrice().multiply(new BigDecimal(itemEntity.getSkuQuantity().toString()));
-//        BigDecimal subtract = orign.subtract(itemEntity.getCouponAmount())
-//                .subtract(itemEntity.getPromotionAmount())
-//                .subtract(itemEntity.getIntegrationAmount());
-//        itemEntity.setRealAmount(subtract);
-//
-//        return itemEntity;
-//    }
+    private OrderItemEntity buildOrderItem(OrderItemVo cartItem) {
+        OrderItemEntity itemEntity = new OrderItemEntity();
+        //1、订单信息：订单号() v
+        //2、商品的SPU信息  V
+        Long skuId = cartItem.getSkuId();
+        R r = productFeignService.getSpuInfoBySkuId(skuId);
+        SpuInfoVo data = r.getData(new TypeReference<SpuInfoVo>() {
+        });
+        itemEntity.setSpuId(data.getId());
+        itemEntity.setSpuBrand(data.getBrandId().toString());
+        itemEntity.setSpuName(data.getSpuName());
+        itemEntity.setCategoryId(data.getCatalogId());
+        //3、商品的sku信息  v
+        itemEntity.setSkuId(cartItem.getSkuId());
+        itemEntity.setSkuName(cartItem.getTitle());
+        itemEntity.setSkuPic(cartItem.getImage());
+        itemEntity.setSkuPrice(cartItem.getPrice());
+        String skuAttr = StringUtils.collectionToDelimitedString(cartItem.getSkuAttr(), ";");
+        itemEntity.setSkuAttrsVals(skuAttr);
+        itemEntity.setSkuQuantity(cartItem.getCount());
+        //4、优惠信息（xxxx）
+        //5、积分信息
+        itemEntity.setGiftGrowth(cartItem.getPrice().multiply(new BigDecimal(cartItem.getCount().toString())).intValue());
+        itemEntity.setGiftIntegration(cartItem.getPrice().multiply(new BigDecimal(cartItem.getCount().toString())).intValue());
+        //6、订单项的价格信息
+        itemEntity.setPromotionAmount(new BigDecimal("0"));
+        itemEntity.setCouponAmount(new BigDecimal("0"));
+        itemEntity.setIntegrationAmount(new BigDecimal("0"));
+        //当前订单项的实际金额。 总额-各种优惠
+        BigDecimal orign = itemEntity.getSkuPrice().multiply(new BigDecimal(itemEntity.getSkuQuantity().toString()));
+        BigDecimal subtract = orign.subtract(itemEntity.getCouponAmount())
+                .subtract(itemEntity.getPromotionAmount())
+                .subtract(itemEntity.getIntegrationAmount());
+        itemEntity.setRealAmount(subtract);
+
+        return itemEntity;
+    }
 
 
 }
