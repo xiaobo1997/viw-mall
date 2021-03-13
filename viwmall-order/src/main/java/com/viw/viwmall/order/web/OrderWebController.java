@@ -59,6 +59,8 @@ public class OrderWebController {
      * 下单失败： 回订单确认页面
      *
      * @param vo
+     * @param model
+     * @param redirectAttributes 重定向携带数据
      * @return
      */
     @PostMapping("/submitOrder")
@@ -86,7 +88,7 @@ public class OrderWebController {
                         msg += "库存锁定失败，商品库存不足";
                         break;
                 }
-                redirectAttributes.addFlashAttribute("msg", msg);
+                redirectAttributes.addFlashAttribute("msg", msg); //重定向时携带数据
                 return "redirect:http://order.viwmall.com/toTrade";
             }
         } catch (Exception e) {

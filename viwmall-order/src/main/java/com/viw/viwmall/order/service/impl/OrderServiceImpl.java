@@ -228,7 +228,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, OrderEntity> impleme
                 R r = wmsFeignService.orderLockStock(lockVo);
                 if (r.getCode() == 0) {
                     //锁成功了
-                    response.setOrder(order.getOrder());
+                    response.setOrder(order.getOrder()); // 把订单放回响应中
 
                     //TODO 5、远程扣减积分 出异常
 //                    int i = 10/0; //订单回滚，库存不滚
