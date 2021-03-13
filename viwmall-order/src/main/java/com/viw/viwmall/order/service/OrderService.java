@@ -4,6 +4,8 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.viw.common.utils.PageUtils;
 import com.viw.viwmall.order.entity.OrderEntity;
 import com.viw.viwmall.order.vo.OrderConfirmVo;
+import com.viw.viwmall.order.vo.OrderSubmitVo;
+import com.viw.viwmall.order.vo.SubmitOrderResponseVo;
 
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
@@ -29,5 +31,11 @@ public interface OrderService extends IService<OrderEntity> {
     OrderConfirmVo confirmOrder() throws ExecutionException, InterruptedException;
 
 
+    /**
+     * 下单
+     * @param vo
+     * @return
+     */
+    SubmitOrderResponseVo submitOrder(OrderSubmitVo vo);
 }
 
