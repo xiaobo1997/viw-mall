@@ -24,10 +24,7 @@ import org.springframework.data.redis.core.script.DefaultRedisScript;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -204,8 +201,8 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, OrderEntity> impleme
             //1、创建订单，订单项等信息
             OrderCreateTo order = createOrder();
             //2、验价
-            BigDecimal payAmount = order.getOrder().getPayAmount();
-            BigDecimal payPrice = vo.getPayPrice();
+            BigDecimal payAmount = order.getOrder().getPayAmount();//后台计算出的订单价格
+            BigDecimal payPrice = vo.getPayPrice();//页面价格
             if (Math.abs(payAmount.subtract(payPrice).doubleValue()) < 0.01) {
                 //金额对比
                 //....
@@ -218,7 +215,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, OrderEntity> impleme
                 List<OrderItemVo> locks = order.getOrderItems().stream().map(item -> {
                     OrderItemVo itemVo = new OrderItemVo();
                     itemVo.setSkuId(item.getSkuId());
-                    itemVo.setCount(item.getSkuQuantity());
+                    itemVo.setCount(item.getSkuQuantity()); // 要锁的库存数量
                     itemVo.setTitle(item.getSkuName());
                     return itemVo;
                 }).collect(Collectors.toList());
@@ -254,6 +251,25 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, OrderEntity> impleme
         }
     }
 
+
+    /**
+     * 保存订单数据
+     *
+     * @param order
+     */
+    private void saveOrder(OrderCreateTo order) {
+        OrderEntity orderEntity = order.getOrder();
+        orderEntity.setModifyTime(new Date());
+        this.save(orderEntity);
+
+        List<OrderItemEntity> orderItems = order.getOrderItems();
+        orderItemService.saveBatch(orderItems);
+    }
+
+
+
+    //===============创建订单&订单项&验价  开始
+
     /**
      * 创建订单
      * @return
@@ -286,7 +302,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, OrderEntity> impleme
         MemberRespVo respVo = LoginUserInterceptor.loginUser.get();
         OrderEntity entity = new OrderEntity();
         entity.setOrderSn(orderSn);
-        entity.setMemberId(respVo.getId());
+        entity.setMemberId(respVo.getId());// 直接从拦截器中拿
 
 
         OrderSubmitVo submitVo = confirmVoThreadLocal.get();
@@ -372,6 +388,47 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, OrderEntity> impleme
 
         return itemEntity;
     }
+
+    /**
+     * 计算价格、积分等相关
+     * @param orderEntity
+     * @param itemEntities
+     */
+    private void computePrice(OrderEntity orderEntity, List<OrderItemEntity> itemEntities) {
+        BigDecimal total = new BigDecimal("0.0");
+
+        BigDecimal coupon = new BigDecimal("0.0");
+        BigDecimal integration = new BigDecimal("0.0");
+        BigDecimal promotion = new BigDecimal("0.0");
+
+        BigDecimal gift = new BigDecimal("0.0");
+        BigDecimal growth = new BigDecimal("0.0");
+        //订单的总额，叠加每一个订单项的总额信息
+        for (OrderItemEntity entity : itemEntities) {
+            coupon = coupon.add(entity.getCouponAmount());
+            integration = integration.add(entity.getIntegrationAmount());
+            promotion = promotion.add(entity.getPromotionAmount());
+            total = total.add(entity.getRealAmount());
+            gift = gift.add(new BigDecimal(entity.getGiftIntegration().toString()));
+//            Integer growth = entity.getGiftGrowth();
+            growth = growth.add(new BigDecimal(entity.getGiftGrowth().toString()));
+
+        }
+        //1、订单价格相关
+        orderEntity.setTotalAmount(total);
+        //应付总额
+        orderEntity.setPayAmount(total.add(orderEntity.getFreightAmount()));
+        orderEntity.setPromotionAmount(promotion);
+        orderEntity.setIntegrationAmount(integration);
+        orderEntity.setCouponAmount(coupon);
+
+        //设置积分等信息
+        orderEntity.setIntegration(gift.intValue());
+        orderEntity.setGrowth(growth.intValue());
+        orderEntity.setDeleteStatus(0);//未删除
+    }
+
+    //===============创建订单&订单项&验价  结束
 
 
 }

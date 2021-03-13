@@ -36,6 +36,11 @@ public interface WmsFeignService {
     @GetMapping("/ware/wareinfo/fare")
     R getFare(@RequestParam("addrId") Long addrId);
 
+    /**
+     * 为订单 锁库存
+     * @param vo
+     * @return
+     */
     @PostMapping("/ware/waresku/lock/order")
     R orderLockStock(@RequestBody WareSkuLockVo vo);
 
