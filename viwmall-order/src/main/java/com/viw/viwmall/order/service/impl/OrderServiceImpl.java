@@ -3,6 +3,7 @@ package com.viw.viwmall.order.service.impl;
 import com.alibaba.fastjson.TypeReference;
 import com.viw.common.utils.R;
 import com.viw.common.vo.MemberRespVo;
+import com.viw.viwmall.order.constant.OrderConstant;
 import com.viw.viwmall.order.feign.CartFeignService;
 import com.viw.viwmall.order.feign.MemberFeignService;
 import com.viw.viwmall.order.feign.ProductFeignService;
@@ -10,10 +11,7 @@ import com.viw.viwmall.order.feign.WmsFeignService;
 import com.viw.viwmall.order.interceptor.LoginUserInterceptor;
 import com.viw.viwmall.order.service.OrderItemService;
 import com.viw.viwmall.order.service.PaymentInfoService;
-import com.viw.viwmall.order.vo.MemberAddressVo;
-import com.viw.viwmall.order.vo.OrderConfirmVo;
-import com.viw.viwmall.order.vo.OrderItemVo;
-import com.viw.viwmall.order.vo.SkuStockVo;
+import com.viw.viwmall.order.vo.*;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -25,6 +23,7 @@ import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -141,10 +140,12 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, OrderEntity> impleme
 
         //4、其他数据自动计算
 
-        //TODO 5、防重令牌
-//        String token = UUID.randomUUID().toString().replace("-", "");
-//        redisTemplate.opsForValue().set(OrderConstant.USER_ORDER_TOKEN_PREFIX + memberRespVo.getId(), token, 30, TimeUnit.MINUTES);
-//        confirmVo.setOrderToken(token);
+        //TODO 5、防重令牌  接口幂等
+        String token = UUID.randomUUID().toString().replace("-", "");
+        // 服务器存一个令牌
+        redisTemplate.opsForValue().set(OrderConstant.USER_ORDER_TOKEN_PREFIX + memberRespVo.getId(), token, 30, TimeUnit.MINUTES);
+        //给页面返回一个令牌
+        confirmVo.setOrderToken(token);
 
         CompletableFuture.allOf(getAddressFuture, cartFuture).get();
 
