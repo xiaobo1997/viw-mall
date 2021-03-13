@@ -1,15 +1,19 @@
 package com.viw.viwmall.order.service.impl;
 
+import com.alibaba.fastjson.TypeReference;
 import com.viw.common.utils.R;
 import com.viw.common.vo.MemberRespVo;
 import com.viw.viwmall.order.feign.CartFeignService;
 import com.viw.viwmall.order.feign.MemberFeignService;
+import com.viw.viwmall.order.feign.ProductFeignService;
+import com.viw.viwmall.order.feign.WmsFeignService;
 import com.viw.viwmall.order.interceptor.LoginUserInterceptor;
 import com.viw.viwmall.order.service.OrderItemService;
 import com.viw.viwmall.order.service.PaymentInfoService;
 import com.viw.viwmall.order.vo.MemberAddressVo;
 import com.viw.viwmall.order.vo.OrderConfirmVo;
 import com.viw.viwmall.order.vo.OrderItemVo;
+import com.viw.viwmall.order.vo.SkuStockVo;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -116,6 +120,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, OrderEntity> impleme
             //feign在远程调用之前要构造请求，调用很多的拦截器
             //RequestInterceptor interceptor : requestInterceptors
         }, executor).thenRunAsync(() -> {
+            //远程调用查询是否有库存
             List<OrderItemVo> items = confirmVo.getItems();
             List<Long> collect = items.stream().map(item -> item.getSkuId()).collect(Collectors.toList());
 

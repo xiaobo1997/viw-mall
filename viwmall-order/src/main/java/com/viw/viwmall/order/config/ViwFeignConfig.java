@@ -35,7 +35,7 @@ public class ViwFeignConfig {
                  * 1、RequestContextHolder拿到刚进来的这个请求   当前toTrade中
                  * 的HttpServletRequest请求的所有属性 {@link com.viw.viwmall.order.web.OrderWebController#toTrade(Model, HttpServletRequest)}
                  */
-                ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+                ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();//原请求
                 if(attributes!=null){
                     System.out.println("RequestInterceptor线程...."+Thread.currentThread().getId());
                     HttpServletRequest request = attributes.getRequest(); //老请求

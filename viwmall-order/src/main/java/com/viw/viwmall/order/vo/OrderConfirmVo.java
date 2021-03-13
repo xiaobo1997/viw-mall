@@ -40,7 +40,7 @@ public class OrderConfirmVo {
 
 
     @Setter @Getter
-    Map<Long,Boolean> stocks;
+    Map<Long,Boolean> stocks; // 是否有库存
 
 
     //防重令牌
