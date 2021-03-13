@@ -17,6 +17,7 @@ import com.viw.viwmall.order.service.OrderItemService;
 import com.viw.viwmall.order.service.PaymentInfoService;
 import com.viw.viwmall.order.to.OrderCreateTo;
 import com.viw.viwmall.order.vo.*;
+import io.seata.spring.annotation.GlobalTransactional;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;

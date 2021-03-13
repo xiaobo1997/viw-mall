@@ -74,7 +74,11 @@
 <!--            <artifactId>spring-cloud-starter-alicloud-oss</artifactId>-->
 <!--        </dependency>-->
 
-
+<!--    seata    -->
+        <dependency>
+            <groupId>com.alibaba.cloud</groupId>
+            <artifactId>spring-cloud-starter-alibaba-seata</artifactId>
+        </dependency>
 
 
         <dependency>
