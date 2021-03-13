@@ -8,6 +8,7 @@ import com.viw.viwmall.ware.entity.WareOrderTaskEntity;
 import com.viw.viwmall.ware.feign.ProductFeignService;
 import com.viw.viwmall.ware.vo.OrderItemVo;
 import com.viw.viwmall.ware.vo.WareSkuLockVo;
+import lombok.Data;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,7 +41,7 @@ public class WareSkuServiceImpl extends ServiceImpl<WareSkuDao, WareSkuEntity> i
     ProductFeignService productFeignService;
 
     /**
-     * 为某个订单锁定库存
+     * 为某个订单锁定库存,里面某一个商品都需要锁库存
      * <p>
      * (rollbackFor = NoStockException.class)
      * 默认只要是运行时异常都会回滚
@@ -51,7 +52,6 @@ public class WareSkuServiceImpl extends ServiceImpl<WareSkuDao, WareSkuEntity> i
      *           <p>
      *           2）、下订单成功，库存锁定成功，接下来的业务调用失败，导致订单回滚。
      *           之前锁定的库存就要自动解锁。
-     *
      * @return
      */
     @Transactional
@@ -84,7 +84,7 @@ public class WareSkuServiceImpl extends ServiceImpl<WareSkuDao, WareSkuEntity> i
 
         //2、锁定库存
         for (SkuWareHasStock hasStock : collect) {
-            Boolean skuStocked = false;
+            Boolean skuStocked = false; // 商品库存是否都锁定了
             Long skuId = hasStock.getSkuId();
             List<Long> wareIds = hasStock.getWareId();
             if (wareIds == null || wareIds.size() == 0) {
@@ -96,7 +96,7 @@ public class WareSkuServiceImpl extends ServiceImpl<WareSkuDao, WareSkuEntity> i
             //     1： 1 - 2 - 1   2：2-1-2  3：3-1-1(x)
             for (Long wareId : wareIds) {
                 //成功就返回1,否则就是0
-                Long count = wareSkuDao.lockSkuStock(skuId, wareId, hasStock.getNum());
+                Long count = wareSkuDao.lockSkuStock(skuId, wareId, hasStock.getNum()); //锁库存
                 if (count == 1) {
                     skuStocked = true;
                     //TODO 告诉MQ库存锁定成功
@@ -110,9 +110,11 @@ public class WareSkuServiceImpl extends ServiceImpl<WareSkuDao, WareSkuEntity> i
                     lockedTo.setDetail(stockDetailTo);
 //                    rabbitTemplate
                     rabbitTemplate.convertAndSend("stock-event-exchange", "stock.locked", lockedTo);
-                    break;
+                    break; // 当前sku锁上了库存，下一个商品继续锁库存
                 } else {
                     //当前仓库锁失败，重试下一个仓库
+
+
                 }
             }
             if (skuStocked == false) {
@@ -128,12 +130,8 @@ public class WareSkuServiceImpl extends ServiceImpl<WareSkuDao, WareSkuEntity> i
     }
 
 
-
-
     @Override
     public List<SkuHasStockVo> getSkusHasStock(List<Long> skuIds) {
-
-
         List<SkuHasStockVo> collect = skuIds.stream().map(skuId -> {
             SkuHasStockVo vo = new SkuHasStockVo();
 
@@ -151,6 +149,7 @@ public class WareSkuServiceImpl extends ServiceImpl<WareSkuDao, WareSkuEntity> i
     /**
      * 入库操作
      * 根据商品id给某一个仓库增加库存
+     *
      * @param skuId
      * @param wareId
      * @param skuNum
@@ -159,7 +158,7 @@ public class WareSkuServiceImpl extends ServiceImpl<WareSkuDao, WareSkuEntity> i
     public void addStock(Long skuId, Long wareId, Integer skuNum) {
         //1、判断如果还没有这个库存记录新增
         List<WareSkuEntity> entities = wareSkuDao.selectList(new QueryWrapper<WareSkuEntity>().eq("sku_id", skuId).eq("ware_id", wareId));
-        if(entities == null || entities.size() == 0){
+        if (entities == null || entities.size() == 0) {
             WareSkuEntity skuEntity = new WareSkuEntity();
             skuEntity.setSkuId(skuId);
             skuEntity.setStock(skuNum);
@@ -170,21 +169,20 @@ public class WareSkuServiceImpl extends ServiceImpl<WareSkuDao, WareSkuEntity> i
             //TODO 还可以用什么办法让异常出现以后不回滚？高级
             try {
                 R info = productFeignService.info(skuId);
-                Map<String,Object> data = (Map<String, Object>) info.get("skuInfo");
+                Map<String, Object> data = (Map<String, Object>) info.get("skuInfo");
 
-                if(info.getCode() == 0){
+                if (info.getCode() == 0) {
                     skuEntity.setSkuName((String) data.get("skuName"));
                 }
-            }catch (Exception e){
+            } catch (Exception e) {
 
             }
             wareSkuDao.insert(skuEntity);
-        }else{
-            wareSkuDao.addStock(skuId,wareId,skuNum);
+        } else {
+            wareSkuDao.addStock(skuId, wareId, skuNum);
         }
 
     }
-
 
 
     @Override
@@ -195,13 +193,13 @@ public class WareSkuServiceImpl extends ServiceImpl<WareSkuDao, WareSkuEntity> i
          */
         QueryWrapper<WareSkuEntity> queryWrapper = new QueryWrapper<>();
         String skuId = (String) params.get("skuId");
-        if(!StringUtils.isEmpty(skuId)){
-            queryWrapper.eq("sku_id",skuId);
+        if (!StringUtils.isEmpty(skuId)) {
+            queryWrapper.eq("sku_id", skuId);
         }
 
         String wareId = (String) params.get("wareId");
-        if(!StringUtils.isEmpty(wareId)){
-            queryWrapper.eq("ware_id",wareId);
+        if (!StringUtils.isEmpty(wareId)) {
+            queryWrapper.eq("ware_id", wareId);
         }
 
 
@@ -211,6 +209,14 @@ public class WareSkuServiceImpl extends ServiceImpl<WareSkuDao, WareSkuEntity> i
         );
 
         return new PageUtils(page);
+    }
+
+
+    @Data
+    class SkuWareHasStock {
+        private Long skuId;
+        private Integer num;
+        private List<Long> wareId;
     }
 
 }
