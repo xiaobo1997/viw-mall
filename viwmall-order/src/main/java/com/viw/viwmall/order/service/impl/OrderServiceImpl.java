@@ -85,6 +85,18 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, OrderEntity> impleme
     ThreadPoolExecutor executor;
 
 
+    /**
+     * 查询状态
+     * @param orderSn
+     * @return
+     */
+    @Override
+    public OrderEntity getOrderByOrderSn(String orderSn) {
+        OrderEntity order_sn = this.getOne(new QueryWrapper<OrderEntity>().eq("order_sn", orderSn));
+        return order_sn;
+    }
+
+
     @Override
     public PageUtils queryPage(Map<String, Object> params) {
         IPage<OrderEntity> page = this.page(

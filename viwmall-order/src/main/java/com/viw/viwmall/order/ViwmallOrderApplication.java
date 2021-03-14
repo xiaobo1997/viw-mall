@@ -1,5 +1,6 @@
 package com.viw.viwmall.order;
 
+import com.alibaba.cloud.seata.GlobalTransactionAutoConfiguration;
 import org.springframework.amqp.rabbit.annotation.EnableRabbit;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -9,7 +10,7 @@ import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.session.data.redis.config.annotation.web.http.EnableRedisHttpSession;
 
 @EnableAspectJAutoProxy(exposeProxy = true) //使用aop代理
-@SpringBootApplication
+@SpringBootApplication(exclude = GlobalTransactionAutoConfiguration.class)
 @EnableRabbit
 @EnableDiscoveryClient
 @EnableFeignClients

@@ -33,6 +33,9 @@ public class LoginUserInterceptor implements HandlerInterceptor {
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
 
+        /**
+         * 路径匹配，否则feign 调用会被拦截
+         */
         //  /order/order/status/2948294820984028420
         String uri = request.getRequestURI();
         AntPathMatcher antPathMatcher = new AntPathMatcher();
