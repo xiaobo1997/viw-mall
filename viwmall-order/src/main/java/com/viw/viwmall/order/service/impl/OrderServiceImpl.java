@@ -164,7 +164,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, OrderEntity> impleme
     //分布式事务： 最大原因。网络问题+分布式机器。
     //(isolation = Isolation.REPEATABLE_READ)
     //REQUIRED、REQUIRES_NEW
-//    @GlobalTransactional  //高并发
+//    @GlobalTransactional  //不适高并发场景
     @Transactional
     @Override
     public SubmitOrderResponseVo submitOrder(OrderSubmitVo vo) {

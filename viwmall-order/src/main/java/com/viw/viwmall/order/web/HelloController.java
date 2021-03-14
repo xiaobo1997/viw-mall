@@ -25,6 +25,10 @@ public class HelloController {
     @Autowired
     RabbitTemplate rabbitTemplate;
 
+    /**
+     * 测试创建订单，测试MQ 延时队列
+     * @return
+     */
     @ResponseBody
     @GetMapping("/test/createOrder")
     public String createOrderTest(){
@@ -41,7 +45,6 @@ public class HelloController {
 
     @GetMapping("/{page}.html")
     public String listPage(@PathVariable("page") String page){
-
         return page;
     }
 }
