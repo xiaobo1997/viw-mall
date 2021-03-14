@@ -86,7 +86,7 @@ public class SeckillServiceImpl implements SeckillService {
                 Long startTime = sesssion.getStartTime().getTime();
                 Long endTime = sesssion.getEndTime().getTime();
                 String key = SESSIONS_CACHE_PREFIX + startTime + "_" + endTime;
-                Boolean hasKey = redisTemplate.hasKey(key);
+                Boolean hasKey = redisTemplate.hasKey(key);//是否存在key
                 if (!hasKey) {
                     List<String> collect = sesssion.getRelationSkus().stream().map(item -> item.getPromotionSessionId() + "_" + item.getSkuId().toString()).collect(Collectors.toList());
                     //缓存活动信息
@@ -112,6 +112,7 @@ public class SeckillServiceImpl implements SeckillService {
                     //4、随机码？  seckill?skuId=1&key=dadlajldj； 复杂脚本攻击接口
                     String token = UUID.randomUUID().toString().replace("-", "");
 
+                    //是否存在keys
                     if (!ops.hasKey(seckillSkuVo.getPromotionSessionId().toString() + "_" + seckillSkuVo.getSkuId().toString())) {
                         //缓存商品
                         SecKillSkuRedisTo redisTo = new SecKillSkuRedisTo();

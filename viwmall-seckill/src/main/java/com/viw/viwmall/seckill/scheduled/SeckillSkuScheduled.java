@@ -36,6 +36,7 @@ public class SeckillSkuScheduled {
     @Autowired
     RedissonClient redissonClient;
 
+    // 分布式锁
     private final String upload_lock = "seckill:upload:lock";
 
     //TODO 幂等性处理
