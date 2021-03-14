@@ -25,37 +25,37 @@ public class MyMQConfig {
 
 
     @RabbitListener
-    public void listenerOrder(OrderEntity entity, Channel channel, Message message){
-        System.out.println("收到过期的消息，准备关闭订单："+entity);
+    public void listenerOrder(OrderEntity entity, Channel channel, Message message) {
+        System.out.println("收到过期的消息，准备关闭订单：" + entity);
     }
 
     /**
-     //@Bean Binding，Queue，Exchange
+     * //@Bean Binding，Queue，Exchange
      * 容器中的 Binding，Queue，Exchange 都会自动创建（RabbitMQ没有的情况）
      * RabbitMQ 只要有队列 重复启动。@Bean声明属性发生变化也不会覆盖
-     * @return
      *
-     * 死信队列
+     * @return 死信队列
      */
     @Bean
     public Queue orderDelayQueue() {
-        Map<String,Object> arguments = new HashMap<>();
+        Map<String, Object> arguments = new HashMap<>();
         /**
          * 队列A的参数
          * x-dead-letter-exchange: order-event-exchange
          * x-dead-letter-routing-key: order.release.order
          * x-message-ttl: 60000
          */
-        arguments.put("x-dead-letter-exchange","order-event-exchange");
-        arguments.put("x-dead-letter-routing-key","order.release.order");
-        arguments.put("x-message-ttl",60000);
+        arguments.put("x-dead-letter-exchange", "order-event-exchange");
+        arguments.put("x-dead-letter-routing-key", "order.release.order");
+        arguments.put("x-message-ttl", 60000);
         //String name, boolean durable, boolean exclusive, boolean autoDelete, Map<String, Object> arguments
-        Queue queue = new Queue("order.delay.queue", true, false, false,arguments);
+        Queue queue = new Queue("order.delay.queue", true, false, false, arguments);
         return queue;
     }
 
     /**
      * 延时队列  普通队列B
+     *
      * @return
      */
     @Bean
@@ -66,16 +66,18 @@ public class MyMQConfig {
 
     /**
      * 延时交换机
+     *
      * @return Topic类型的交换机
      */
     @Bean
     public Exchange orderEventExchange() {
         //String name, boolean durable, boolean autoDelete, Map<String, Object> arguments
-        return new TopicExchange("order-event-exchange",true,false);
+        return new TopicExchange("order-event-exchange", true, false);
     }
 
     /**
      * 延时队列中的  order.delay.queue 和 order-event-exchange 的 bind
+     *
      * @return
      */
     @Bean
@@ -91,6 +93,7 @@ public class MyMQConfig {
 
     /**
      * 延时队列中的  order.release.order.queue 和 order-event-exchange 的 bind
+     *
      * @return
      */
     @Bean
@@ -103,6 +106,19 @@ public class MyMQConfig {
     }
 
 
+    /**
+     * 订单释放后  订单系统 直接和库存系统队列 通信释放进行绑定
+     *
+     * @return
+     */
+    @Bean
+    public Binding orderReleaseOtherBingding() {
+        return new Binding("stock.release.stock.queue",
+                Binding.DestinationType.QUEUE,
+                "order-event-exchange",
+                "order.release.other.#",
+                null);
+    }
 
 
 }

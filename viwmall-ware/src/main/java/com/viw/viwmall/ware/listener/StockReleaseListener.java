@@ -41,6 +41,13 @@ public class StockReleaseListener {
 
     }
 
+    /**
+     * 监听订单系统放来的 订单数据
+     * @param orderTo
+     * @param message
+     * @param channel
+     * @throws IOException
+     */
     @RabbitHandler
     public void handleOrderCloseRelease(OrderTo orderTo, Message message, Channel channel) throws IOException {
         System.out.println("订单关闭准备解锁库存...");

@@ -3,6 +3,7 @@ package com.viw.viwmall.order.service.impl;
 import com.alibaba.fastjson.TypeReference;
 import com.baomidou.mybatisplus.core.toolkit.IdWorker;
 import com.viw.common.exception.NoStockException;
+import com.viw.common.to.mq.OrderTo;
 import com.viw.common.utils.R;
 import com.viw.common.vo.MemberRespVo;
 import com.viw.viwmall.order.constant.OrderConstant;
@@ -19,6 +20,7 @@ import com.viw.viwmall.order.to.OrderCreateTo;
 import com.viw.viwmall.order.vo.*;
 import io.seata.spring.annotation.GlobalTransactional;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.script.DefaultRedisScript;
@@ -59,8 +61,8 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, OrderEntity> impleme
     @Autowired
     PaymentInfoService paymentInfoService;
 
-//    @Autowired
-//    OrderService orderService;
+    @Autowired
+    OrderService orderService;
 
     @Autowired
     OrderItemService orderItemService;
@@ -442,6 +444,37 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, OrderEntity> impleme
     }
 
     //===============创建订单&订单项&验价  结束
+
+
+    /**
+     * 关单
+     * @param entity
+     */
+    @Override
+    public void closeOrder(OrderEntity entity) {
+        //查询当前这个订单的最新状态
+        OrderEntity orderEntity = this.getById(entity.getId());
+        if (orderEntity.getStatus().equals(OrderStatusEnum.CREATE_NEW.getCode())) {
+            //关单
+            OrderEntity update = new OrderEntity();
+            update.setId(entity.getId());
+            update.setStatus(OrderStatusEnum.CANCLED.getCode());
+            this.updateById(update);
+            OrderTo orderTo = new OrderTo();
+            BeanUtils.copyProperties(orderEntity, orderTo);
+            //发给MQ一个
+            try {
+                //TODO 保证消息一定会发送出去，每一个消息都可以做好日志记录（给数据库保存每一个消息的详细信息）。
+                //TODO 定期扫描数据库将失败的消息再发送一遍；
+                rabbitTemplate.convertAndSend("order-event-exchange", "order.release.other", orderTo);
+            } catch (Exception e) {
+                //TODO 将没法送成功的消息进行重试发送。
+//                while)
+            }
+
+
+        }
+    }
 
 
 }

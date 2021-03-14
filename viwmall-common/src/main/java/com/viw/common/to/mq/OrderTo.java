@@ -11,6 +11,7 @@ import java.util.Date;
  * @gitee:https://gitee.com/xiaobo97
  * @Date: 2021/3/14 10:57
  * @description:
+ * 订单超时 订单系统 给 库存系统队列发信息 清除订单 TO
  */
 
 @Data
