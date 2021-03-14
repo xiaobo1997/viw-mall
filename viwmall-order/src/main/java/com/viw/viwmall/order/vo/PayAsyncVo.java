@@ -3,6 +3,8 @@ package com.viw.viwmall.order.vo;
 import lombok.Data;
 import lombok.ToString;
 
+import java.util.Date;
+
 /**
  * @Author: xhb
  * @Email: xiaobo97@163.com

@@ -3,10 +3,7 @@ package com.viw.viwmall.order.service;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.viw.common.utils.PageUtils;
 import com.viw.viwmall.order.entity.OrderEntity;
-import com.viw.viwmall.order.vo.OrderConfirmVo;
-import com.viw.viwmall.order.vo.OrderSubmitVo;
-import com.viw.viwmall.order.vo.PayVo;
-import com.viw.viwmall.order.vo.SubmitOrderResponseVo;
+import com.viw.viwmall.order.vo.*;
 
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
@@ -57,5 +54,7 @@ public interface OrderService extends IService<OrderEntity> {
     PayVo getOrderPay(String orderSn);
 
     PageUtils queryPageWithItem(Map<String, Object> params);
+
+    String handlePayResult(PayAsyncVo vo);
 }
 

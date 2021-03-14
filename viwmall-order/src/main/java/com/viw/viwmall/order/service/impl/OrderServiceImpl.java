@@ -8,6 +8,7 @@ import com.viw.common.utils.R;
 import com.viw.common.vo.MemberRespVo;
 import com.viw.viwmall.order.constant.OrderConstant;
 import com.viw.viwmall.order.entity.OrderItemEntity;
+import com.viw.viwmall.order.entity.PaymentInfoEntity;
 import com.viw.viwmall.order.enume.OrderStatusEnum;
 import com.viw.viwmall.order.feign.CartFeignService;
 import com.viw.viwmall.order.feign.MemberFeignService;
@@ -522,6 +523,35 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, OrderEntity> impleme
         page.setRecords(order_sn);
 
         return new PageUtils(page);
+    }
+
+
+    /**
+     * 处理支付宝的支付结果
+     *
+     * @param vo
+     *
+     * @return
+     */
+    @Override
+    public String handlePayResult(PayAsyncVo vo) {
+        //1、保存交易流水
+        PaymentInfoEntity infoEntity = new PaymentInfoEntity();
+        infoEntity.setAlipayTradeNo(vo.getTrade_no());
+        infoEntity.setOrderSn(vo.getOut_trade_no());
+        infoEntity.setPaymentStatus(vo.getTrade_status());
+        infoEntity.setCallbackTime(vo.getNotify_time());
+
+
+        paymentInfoService.save(infoEntity);
+
+        //2、修改订单的状态信息
+        if (vo.getTrade_status().equals("TRADE_SUCCESS") || vo.getTrade_status().equals("TRADE_FINISHED")) {
+            //支付成功状态
+            String outTradeNo = vo.getOut_trade_no();
+            this.baseMapper.updateOrderStatus(outTradeNo,OrderStatusEnum.PAYED.getCode());
+        }
+        return "success";
     }
 
 
