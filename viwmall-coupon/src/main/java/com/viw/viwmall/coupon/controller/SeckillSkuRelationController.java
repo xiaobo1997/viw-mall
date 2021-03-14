@@ -40,7 +40,6 @@ public class SeckillSkuRelationController {
         return R.ok().put("page", page);
     }
 
-
     /**
      * 信息
      */
