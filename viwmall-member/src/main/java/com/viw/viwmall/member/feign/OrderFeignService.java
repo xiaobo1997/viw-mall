@@ -12,7 +12,7 @@ import java.util.Map;
  * @Email: xiaobo97@163.com
  * @gitee:https://gitee.com/xiaobo97
  * @Date: 2021/3/14 19:08
- * @description:
+ * @description: 调用订单访问
  */
 @FeignClient("viwmall-order")
 public interface OrderFeignService {
