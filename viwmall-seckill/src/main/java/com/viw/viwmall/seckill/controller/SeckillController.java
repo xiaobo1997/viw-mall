@@ -61,6 +61,14 @@ public class SeckillController {
         return R.ok().setData(to);
     }
 
+    /**
+     * 秒杀功能
+     * @param killId
+     * @param key
+     * @param num
+     * @param model
+     * @return
+     */
     @GetMapping("/kill")
     public String secKill(@RequestParam("killId") String killId,
                           @RequestParam("key") String key,

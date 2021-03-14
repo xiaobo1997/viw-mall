@@ -2,9 +2,13 @@ package com.viw.viwmall.seckill.service.impl;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.TypeReference;
+import com.baomidou.mybatisplus.core.toolkit.IdWorker;
+import com.viw.common.to.mq.SeckillOrderTo;
 import com.viw.common.utils.R;
+import com.viw.common.vo.MemberRespVo;
 import com.viw.viwmall.seckill.feign.CouponFeignService;
 import com.viw.viwmall.seckill.feign.ProductFeignService;
+import com.viw.viwmall.seckill.interceptor.LoginUserInterceptor;
 import com.viw.viwmall.seckill.service.SeckillService;
 import com.viw.viwmall.seckill.to.SecKillSkuRedisTo;
 import com.viw.viwmall.seckill.vo.SeckillSesssionsWithSkus;
@@ -18,6 +22,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.BoundHashOperations;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import java.util.Date;
 import java.util.List;
@@ -236,6 +241,89 @@ public class SeckillServiceImpl implements SeckillService {
                 ;
             }
         }
+        return null;
+    }
+
+
+
+
+
+    // =================================秒杀服务
+    // TODO 上架秒杀商品的时候，每一个数据都有过期时间。
+    // TODO 秒杀后续的流程，简化了收货地址等信息。
+    @Override
+    public String kill(String killId, String key, Integer num) {
+
+        long s1 = System.currentTimeMillis();
+        MemberRespVo respVo = LoginUserInterceptor.loginUser.get();
+
+        //1、获取当前秒杀商品的详细信息
+        BoundHashOperations<String, String, String> hashOps = redisTemplate.boundHashOps(SKUKILL_CACHE_PREFIX);
+
+        String json = hashOps.get(killId);
+        if (StringUtils.isEmpty(json)) {
+            return null;
+        } else {
+            SecKillSkuRedisTo redis = JSON.parseObject(json, SecKillSkuRedisTo.class);
+            //校验合法性
+            Long startTime = redis.getStartTime();
+            Long endTime = redis.getEndTime();
+            long time = new Date().getTime();
+
+            long ttl = endTime - time;
+
+            //1、校验时间的合法性
+            if (time >= startTime && time <= endTime) {
+                //2、校验随机码和商品id
+                String randomCode = redis.getRandomCode();
+                String skuId = redis.getPromotionSessionId() + "_" + redis.getSkuId();
+                if (randomCode.equals(key) && killId.equals(skuId)) {
+                    //3、验证购物数量是否合理
+                    if (num <= redis.getSeckillLimit()) {
+                        //4、验证这个人是否已经购买过。幂等性; 如果只要秒杀成功，就去占位。  userId_SessionId_skuId
+                        //SETNX
+                        String redisKey = respVo.getId() + "_" + skuId;
+                        //自动过期
+                        Boolean aBoolean = redisTemplate.opsForValue().setIfAbsent(redisKey, num.toString(), ttl, TimeUnit.MILLISECONDS);
+                        if (aBoolean) {
+                            //占位成功说明从来没有买过
+                            RSemaphore semaphore = redissonClient.getSemaphore(SKU_STOCK_SEMAPHORE + randomCode);
+                            //120  20ms
+                            boolean b = semaphore.tryAcquire(num);
+                            if (b) {
+                                //秒杀成功;
+                                //快速下单。发送MQ消息  10ms
+                                String timeId = IdWorker.getTimeId();
+                                SeckillOrderTo orderTo = new SeckillOrderTo();
+                                orderTo.setOrderSn(timeId);
+                                orderTo.setMemberId(respVo.getId());
+                                orderTo.setNum(num);
+                                orderTo.setPromotionSessionId(redis.getPromotionSessionId());
+                                orderTo.setSkuId(redis.getSkuId());
+                                orderTo.setSeckillPrice(redis.getSeckillPrice());
+                                rabbitTemplate.convertAndSend("order-event-exchange", "order.seckill.order", orderTo);
+                                long s2 = System.currentTimeMillis();
+                                log.info("耗时...{}", (s2 - s1));
+                                return timeId;
+                            }
+                            return null;
+
+                        } else {
+                            //说明已经买过了
+                            return null;
+                        }
+
+                    }
+                } else {
+                    return null;
+                }
+
+            } else {
+                return null;
+            }
+        }
+
+
         return null;
     }
 
