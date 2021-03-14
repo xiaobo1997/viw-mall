@@ -9,7 +9,7 @@ import java.math.BigDecimal;
  * @Email: xiaobo97@163.com
  * @gitee:https://gitee.com/xiaobo97
  * @Date: 2021/3/14 10:57
- * @description:
+ * @description: 秒杀 MQ  TO
  */
 @Data
 public class SeckillOrderTo {

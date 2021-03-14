@@ -28,6 +28,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -249,6 +250,14 @@ public class SeckillServiceImpl implements SeckillService {
 
 
     // =================================秒杀服务
+
+    /**
+     *
+     * @param killId
+     * @param key
+     * @param num
+     * @return 成功返回订单号
+     */
     // TODO 上架秒杀商品的时候，每一个数据都有过期时间。
     // TODO 秒杀后续的流程，简化了收货地址等信息。
     @Override
@@ -289,7 +298,7 @@ public class SeckillServiceImpl implements SeckillService {
                             //占位成功说明从来没有买过
                             RSemaphore semaphore = redissonClient.getSemaphore(SKU_STOCK_SEMAPHORE + randomCode);
                             //120  20ms
-                            boolean b = semaphore.tryAcquire(num);
+                            boolean b = semaphore.tryAcquire(num);//尝试从信号量去获取
                             if (b) {
                                 //秒杀成功;
                                 //快速下单。发送MQ消息  10ms
