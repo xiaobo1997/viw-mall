@@ -8,4 +8,5 @@ package com.viw.viwmall.seckill.service;
  * @description:
  */
 public interface SeckillService {
+    void uploadSeckillSkuLatest3Days();
 }
