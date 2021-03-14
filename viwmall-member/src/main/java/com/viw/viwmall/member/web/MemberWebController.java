@@ -39,7 +39,6 @@ public class MemberWebController {
         //获取到支付宝给我们传来的所有请求数据；
 //        request。验证签名，如果正确可以去修改。
 
-
         //查出当前登录的用户的所有订单列表数据
         Map<String,Object> page =new HashMap<>();
         page.put("page",pageNum.toString());
