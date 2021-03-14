@@ -74,9 +74,9 @@ public class MyRabbitConfig {
 
                 /**
                  * 1、做好消息确认机制（pulisher，consumer【手动ack】）
-                 * 2、每一个发送的消息都在数据库做好记录。定期将失败的消息再次发送一遍
+                 * 2、做好补偿，每一个发送的消息都在数据库做好记录。定期将失败的消息再次发送一遍
                  */
-                //服务器收到了；
+                //服务器收到了；把消息持久化
                 //修改消息的状态
                 System.out.println("confirm...correlationData["+correlationData+"]==>ack["+ack+"]==>cause["+cause+"]");
             }

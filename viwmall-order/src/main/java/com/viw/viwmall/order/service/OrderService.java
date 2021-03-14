@@ -5,6 +5,7 @@ import com.viw.common.utils.PageUtils;
 import com.viw.viwmall.order.entity.OrderEntity;
 import com.viw.viwmall.order.vo.OrderConfirmVo;
 import com.viw.viwmall.order.vo.OrderSubmitVo;
+import com.viw.viwmall.order.vo.PayVo;
 import com.viw.viwmall.order.vo.SubmitOrderResponseVo;
 
 import java.util.Map;
@@ -46,5 +47,14 @@ public interface OrderService extends IService<OrderEntity> {
      * @param entity
      */
     void closeOrder(OrderEntity entity);
+
+    /**
+     * 去支付
+     * 获取当前订单的支付信息
+     * @param orderSn
+     * @return
+     */
+    PayVo getOrderPay(String orderSn);
+
 }
 
