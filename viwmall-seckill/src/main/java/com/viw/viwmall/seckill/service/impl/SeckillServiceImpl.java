@@ -21,7 +21,9 @@ import org.springframework.stereotype.Service;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 /**
@@ -56,7 +58,10 @@ public class SeckillServiceImpl implements SeckillService {
 
     private final String SKU_STOCK_SEMAPHORE = "seckill:stock:";//+商品随机码
 
-    private  final String  upload_lock = "seckill:upload:lock";
+    private final String upload_lock = "seckill:upload:lock";
+
+
+    // 秒杀商品上架=============================开始
 
     @Override
     public void uploadSeckillSkuLatest3Days() {
@@ -77,6 +82,7 @@ public class SeckillServiceImpl implements SeckillService {
 
     /**
      * 缓存活动信息
+     *
      * @param sesssions
      */
     private void saveSessionInfos(List<SeckillSesssionsWithSkus> sesssions) {
@@ -101,6 +107,7 @@ public class SeckillServiceImpl implements SeckillService {
 
     /**
      * 缓存活动的关联商品信息
+     *
      * @param sesssions
      */
     private void saveSessionSkuInfos(List<SeckillSesssionsWithSkus> sesssions) {
@@ -139,12 +146,97 @@ public class SeckillServiceImpl implements SeckillService {
                         //5、使用库存作为分布式的信号量  限流；
                         RSemaphore semaphore = redissonClient.getSemaphore(SKU_STOCK_SEMAPHORE + token);
                         //商品可以秒杀的数量作为信号量- 分布式锁，随机码 作信号量 扣库存
-                         semaphore.trySetPermits(seckillSkuVo.getSeckillCount()); // 设置信号量的多少，= 商品的库存
+                        semaphore.trySetPermits(seckillSkuVo.getSeckillCount()); // 设置信号量的多少，= 商品的库存
                         //TODO 设置过期时间。
                         semaphore.expireAt(sesssion.getEndTime());
                     }
                 });
             });
+    }
+
+    // 秒杀商品上架=============================结束
+
+
+    /**
+     * 返回当前时间可以参与的秒杀商品信息
+     * <p>
+     * blockHandler 函数会在原方法被限流/降级/系统保护的时候调用，而 fallback 函数会针对所有类型的异常。
+     *
+     * @return
+     */
+    //  @SentinelResource(value = "getCurrentSeckillSkusResource",blockHandler = "blockHandler")
+    @Override
+    public List<SecKillSkuRedisTo> getCurrentSeckillSkus() {
+        //1、确定当前时间属于哪个秒杀场次。
+        //1970 -
+        long time = new Date().getTime();
+
+        try (Entry entry = SphU.entry("seckillSkus")) {
+            Set<String> keys = redisTemplate.keys(SESSIONS_CACHE_PREFIX + "*");
+            for (String key : keys) {
+                //seckill:sessions:1582250400000_1582254000000
+                String replace = key.replace(SESSIONS_CACHE_PREFIX, "");
+                String[] s = replace.split("_");
+                Long start = Long.parseLong(s[0]);
+                Long end = Long.parseLong(s[1]);
+                if (time >= start && time <= end) {
+                    //2、获取这个秒杀场次需要的所有商品信息
+                    List<String> range = redisTemplate.opsForList().range(key, -100, 100);
+                    BoundHashOperations<String, String, String> hashOps = redisTemplate.boundHashOps(SKUKILL_CACHE_PREFIX);
+                    List<String> list = hashOps.multiGet(range);
+                    if (list != null) {
+                        List<SecKillSkuRedisTo> collect = list.stream().map(item -> {
+                            SecKillSkuRedisTo redis = JSON.parseObject((String) item, SecKillSkuRedisTo.class);
+//                        redis.setRandomCode(null); 当前秒杀开始就需要随机码
+                            return redis;
+                        }).collect(Collectors.toList());
+                        return collect;
+                    }
+                    break;
+                }
+            }
+        } catch (BlockException e) {
+            log.error("资源被限流,{}", e.getMessage());
+        }
+        return null;
+    }
+
+
+    /**
+     * 获取所有秒杀商品
+     * @param skuId
+     * @return
+     */
+    @Override
+    public SecKillSkuRedisTo getSkuSeckillInfo(Long skuId) {
+        //1、找到所有需要参与秒杀的商品的key
+        BoundHashOperations<String, String, String> hashOps = redisTemplate.boundHashOps(SKUKILL_CACHE_PREFIX);
+        Set<String> keys = hashOps.keys();
+        if (keys != null && keys.size() > 0) {
+            String regx = "\\d_" + skuId;
+            for (String key : keys) {
+                //6_4
+                if (Pattern.matches(regx, key)) {
+                    String json = hashOps.get(key);
+                    // 当前商品的预告信息
+                    SecKillSkuRedisTo skuRedisTo = JSON.parseObject(json, SecKillSkuRedisTo.class);
+                    //TODO 加入非空判断
+                    if (skuRedisTo == null) return null;
+                    //随机码
+                    long current = new Date().getTime();
+                    if (current >= skuRedisTo.getStartTime() && current <= skuRedisTo.getEndTime()) {
+                        //TODO
+                    } else {
+                        //TODO 当前商品已经过了秒杀时间要直接删除
+                        hashOps.delete(key);
+                        skuRedisTo.setRandomCode(null);
+                    }
+                    return skuRedisTo;
+                }
+                ;
+            }
+        }
+        return null;
     }
 
 

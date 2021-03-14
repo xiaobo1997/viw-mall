@@ -85,8 +85,6 @@ public class SkuInfoServiceImpl extends ServiceImpl<SkuInfoDao, SkuInfoEntity> i
             skuItemVo.setGroupAttrs(attrGroupVos);
         }, executor);
 
-
-
         //2、sku的图片信息  pms_sku_images
         CompletableFuture<Void> imageFuture = CompletableFuture.runAsync(() -> {
             List<SkuImagesEntity> images = imagesService.getImagesBySkuId(skuId);

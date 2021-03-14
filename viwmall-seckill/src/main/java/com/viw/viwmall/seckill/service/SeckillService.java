@@ -1,5 +1,9 @@
 package com.viw.viwmall.seckill.service;
 
+import com.viw.viwmall.seckill.to.SecKillSkuRedisTo;
+
+import java.util.List;
+
 /**
  * @Author: xhb
  * @Email: xiaobo97@163.com
@@ -9,4 +13,8 @@ package com.viw.viwmall.seckill.service;
  */
 public interface SeckillService {
     void uploadSeckillSkuLatest3Days();
+
+    List<SecKillSkuRedisTo> getCurrentSeckillSkus();
+
+    SecKillSkuRedisTo getSkuSeckillInfo(Long skuId);
 }
