@@ -23,8 +23,25 @@ import javax.annotation.PostConstruct;
 @Configuration
 public class MyRabbitConfig {
 
-    @Autowired
-    private RabbitTemplate rabbitTemplate;
+    //
+//    @Autowired
+    RabbitTemplate rabbitTemplate;
+
+
+    //    public MyRabbitConfig(RabbitTemplate rabbitTemplate){
+//        this.rabbitTemplate = rabbitTemplate;
+//        initRabbitTemplate();
+//    }
+    //TODO
+    @Primary
+    @Bean
+    public RabbitTemplate rabbitTemplate(ConnectionFactory connectionFactory){
+        RabbitTemplate rabbitTemplate = new RabbitTemplate(connectionFactory);
+        this.rabbitTemplate = rabbitTemplate;
+        rabbitTemplate.setMessageConverter(messageConverter());
+        initRabbitTemplate();
+        return rabbitTemplate;
+    }
 
 
     /**
@@ -58,6 +75,7 @@ public class MyRabbitConfig {
      *          channel.basicNack(deliveryTag,false,true);拒签；业务失败，拒签
      */
 //    @PostConstruct //MyRabbitConfig对象创建完成以后，执行这个方法
+
     public void initRabbitTemplate(){
         //设置消息确认回调
         rabbitTemplate.setConfirmCallback(new RabbitTemplate.ConfirmCallback() {
