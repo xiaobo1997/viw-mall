@@ -99,11 +99,11 @@ renren:
     header: token
 
 
-management:
-  endpoints:
-    web:
-      exposure:
-        include: *
+#management:
+#  endpoints:
+#    web:
+#      exposure:
+#        include:
 
 feign:
   sentinel:
