@@ -1,4 +1,4 @@
-package com.viw.viwmall.seckill.config;
+package com.viw.viwmall.coupon.config;
 
 import com.alibaba.csp.sentinel.adapter.servlet.callback.UrlBlockHandler;
 import com.alibaba.csp.sentinel.adapter.servlet.callback.WebCallbackManager;
@@ -16,15 +16,13 @@ import java.io.IOException;
  * @Author: xhb
  * @Email: xiaobo97@163.com
  * @gitee:https://gitee.com/xiaobo97
- * @Date: 2021/3/15 1:53
+ * @Date: 2021/3/16 0:12
  * @description:
  */
-
 @Configuration
-public class SeckillSentinelConfig {
+public class CouponSentinelConfig {
 
-    public SeckillSentinelConfig(){
-        //setUrlBlockHandler 请求被限流时返回的数据
+    public CouponSentinelConfig(){
         WebCallbackManager.setUrlBlockHandler(new UrlBlockHandler(){
             @Override
             public void blocked(HttpServletRequest request, HttpServletResponse response, BlockException ex) throws IOException {

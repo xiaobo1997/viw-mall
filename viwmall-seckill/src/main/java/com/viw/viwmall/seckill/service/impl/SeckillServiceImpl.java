@@ -2,6 +2,7 @@ package com.viw.viwmall.seckill.service.impl;
 
 import com.alibaba.csp.sentinel.Entry;
 import com.alibaba.csp.sentinel.SphU;
+import com.alibaba.csp.sentinel.annotation.SentinelResource;
 import com.alibaba.csp.sentinel.slots.block.BlockException;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.TypeReference;
@@ -166,6 +167,10 @@ public class SeckillServiceImpl implements SeckillService {
     // 秒杀商品上架=============================结束
 
 
+    public  List<SecKillSkuRedisTo> blockHandler(BlockException e){
+        log.error("getCurrentSeckillSkusResource被限流了..");
+        return null;
+    }
     /**
      * 返回当前时间可以参与的秒杀商品信息
      * <p>
@@ -173,7 +178,7 @@ public class SeckillServiceImpl implements SeckillService {
      *
      * @return
      */
-    //  @SentinelResource(value = "getCurrentSeckillSkusResource",blockHandler = "blockHandler")
+      @SentinelResource(value = "getCurrentSeckillSkusResource",blockHandler = "blockHandler")
     @Override
     public List<SecKillSkuRedisTo> getCurrentSeckillSkus() {
         //1、确定当前时间属于哪个秒杀场次。

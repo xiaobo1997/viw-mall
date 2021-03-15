@@ -41,6 +41,12 @@ spring:
     nacos:
       discovery:
         server-addr: 192.168.31.190:8848
+    sentinel:
+      transport:
+        dashboard: localhost:8333
+
+
+
   application:
     name: renren-fast
 #  resources:
@@ -80,3 +86,14 @@ renren:
     # token有效时长，7天，单位秒
     expire: 604800
     header: token
+
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: *
+
+feign:
+  sentinel:
+    enabled: true

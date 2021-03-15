@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.PathVariable;
  * @Date: 2021/3/7 17:52
  * @description:
  */
-@FeignClient(value = "viwmall-seckill",fallback = SeckillFeignServiceFallBack.class)
+@FeignClient(value = "viwmall-seckill",fallback = SeckillFeignServiceFallBack.class) // fallback = SeckillFeignServiceFallBack.class失败的调用类的执行方法
 public interface SeckillFeignService {
 
     @GetMapping("/sku/seckill/{skuId}")
