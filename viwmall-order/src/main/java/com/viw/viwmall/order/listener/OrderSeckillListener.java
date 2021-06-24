@@ -35,6 +35,7 @@ public class OrderSeckillListener {
             orderService.createSeckillOrder(seckillOrder);
             //手动调用支付宝收单；
             channel.basicAck(message.getMessageProperties().getDeliveryTag(),false);
+//            channel.basicGet() 拉取消息
         }catch (Exception e){
             channel.basicReject(message.getMessageProperties().getDeliveryTag(),true);
         }
